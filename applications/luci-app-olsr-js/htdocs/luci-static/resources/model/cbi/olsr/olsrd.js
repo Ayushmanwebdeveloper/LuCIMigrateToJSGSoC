@@ -181,13 +181,13 @@ return view.extend({
 		i.anonymous = true;
 		i.addremove = false;
 
-		i: tab("general", translate("General Settings"));
-		i: tab("addrs", translate("IP Addresses"));
-		i: tab("timing", translate("Timing and Validity"));
+		i.tab("general", translate("General Settings"));
+		i.tab("addrs", translate("IP Addresses"));
+		i.tab("timing", translate("Timing and Validity"));
 
 		mode = i.taboption("general", form.ListValue, "Mode", translate("Mode"), translate("Interface mode is used to prevent unnecessary packet forwarding on switched ethernet interfaces. " + 'Valid modes are "mesh" and "ether". Default is "mesh".'));
-		mode: value("mesh");
-		mode: value("ether");
+		mode.value("mesh");
+		mode.value("ether");
 		mode.optional = true;
 		mode.rmempty = true;
 
