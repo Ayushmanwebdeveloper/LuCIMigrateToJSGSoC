@@ -6,7 +6,7 @@ return view.extend({
 	render: function() {
 			var m, s, o;
 
-			m = form.Map("luci_olsr", _("OLSR - Display Options"))
+			m = new form.Map("luci_olsr", _("OLSR - Display Options"))
 
 			s = m.section(form.TypedSection, "olsr")
 			s.anonymous = true
