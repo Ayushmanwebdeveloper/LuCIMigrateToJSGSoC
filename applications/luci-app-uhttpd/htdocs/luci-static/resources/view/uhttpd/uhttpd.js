@@ -112,34 +112,30 @@ return view.extend({
 		var removeOld = ucs.taboption("general", form.Button, "remove_old", _("Remove old certificate and key"), _("uHTTPd will generate a new self-signed certificate using the configuration shown below."));
 		removeOld.inputstyle = "remove";
 
-		removeOld.write = function (section_id) {
-			if (cert_file.cfgvalue(section_id) && fs.read(cert_file.cfgvalue(section_id))) {
-				fs.unlink(cert_file.cfgvalue(section_id));
-			}
-			if (key_file.cfgvalue(section_id) && fs.read(key_file.cfgvalue(section_id))) {
-				fs.unlink(key_file.cfgvalue(section_id));
-			}
-
-			fs.exec("/etc/init.d/uhttpd", ["restart"]);
-			window.location.href("/admin/services/uhttpd");
+		removeOld.onclick = function (section_id) {
+			fs.remove(`${uci.get("uhttpd", "main", "cert")}`);
+			fs.remove(`${uci.get("uhttpd", "main", "key")}`);
+   uci.unset("uhttpd", "main", "cert");
+			uci.unset("uhttpd", "main", "key");
+   uci.save();
+   fs.exec("/etc/init.d/uhttpd", ["restart"]);
+			window.location.reload();
 		};
 
 		var removeConf = ucs.taboption("general", form.Button, "remove_conf", _("Remove configuration for certificate and key"), _("This permanently deletes the cert, key, and configuration to use same."));
 		removeConf.inputstyle = "remove";
-
-		removeConf.write = function (section_id) {
-			if (cert_file.cfgvalue(section_id) && fs.read(cert_file.cfgvalue(section_id))) {
-				fs.unlink(cert_file.cfgvalue(section_id));
-			}
-			if (key_file.cfgvalue(section_id) && fs.read(key_file.cfgvalue(section_id))) {
-				fs.unlink(key_file.cfgvalue(section_id));
-			}
-			uci.unset("uhttpd", section_id, "cert");
-			uci.unset("uhttpd", section_id, "key");
-			uci.unset("uhttpd", section_id, "listen_https");
-			window.location.href("/admin/services/uhttpd");
+		removeConf.onclick = function (section_id) {
+			fs.remove(`${uci.get("uhttpd", "main", "cert")}`);
+			fs.remove(`${uci.get("uhttpd", "main", "key")}`);
+			uci.unset("uhttpd", "main", "cert");
+			uci.unset("uhttpd", "main", "key");
+			uci.unset("uhttpd", "main", "listen_https");
+   uci.save();
+   console.log(uci.get("uhttpd", "main", "cert"));
+   fs.exec("/etc/init.d/uhttpd", ["restart"]);
+			window.location.reload();
 		};
-
+		
 		var indexPage = ucs.taboption("server", form.DynamicList, "index_page", _("Index page(s)"), _("E.g specify with index.html and index.php when using PHP"));
 		indexPage.optional = true;
 		indexPage.placeholder = "index.html";
