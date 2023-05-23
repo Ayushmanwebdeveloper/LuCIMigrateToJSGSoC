@@ -5,7 +5,6 @@
 
 return view.extend({
 	render: function () {
-		var ipv = uci.get_first("olsrd", "olsrd", "IpVersion") || "4";
 
 		mh = new form.Map("olsrd6", translate("OLSR - HNA6-Announcements"), translate("Hosts in an OLSR routed network can announce connectivity " + "to external networks using HNA6 messages."));
 
