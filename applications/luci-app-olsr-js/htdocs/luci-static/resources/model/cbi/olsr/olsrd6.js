@@ -284,12 +284,13 @@ return view.extend({
 		ifs = m.section(form.TypedSection, "Interface", _("Interfaces"));
 		ifs.addremove = true;
 		ifs.anonymous = true;
-		ifs.extedit = luci.dispatcher.build_url("admin/services/olsrd6/iface/%s");
+		ifs.extedit = "admin/services/olsrd6/iface";
 		ifs.template = "cbi/tblsection";
 
 		ifs.create = function () {
 			var sid = uci.add("olsrd6", "Interface");
-			window.location.href = `${ifs.extedit}${sid}`;
+			uci.save();
+			window.location.href = `${ifs.extedit}/${sid}`;
 		};
 		ign = ifs.option(form.Flag, "ignore", _("Enable"));
 		ign.enabled = "0";
