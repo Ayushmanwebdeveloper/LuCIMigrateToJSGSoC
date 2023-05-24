@@ -16,7 +16,7 @@ return view.extend({
 
 		m.redirect = luci.dispatcher.build_url("admin/services/olsrd"); //to review again
 
-		if (!process.argv[2] || m.uci.get("olsrd", process.argv[2]) !== "Interface") {
+		if (!process.argv[2] || uci.get("olsrd","main", process.argv[2])!== "Interface") {
 			window.location.href = m.redirect;
 			return;
 		}
