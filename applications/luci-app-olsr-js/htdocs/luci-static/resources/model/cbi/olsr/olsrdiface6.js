@@ -12,11 +12,11 @@ return view.extend({
 			}
 		}
 
-		m = new form.Map("olsrd", _("OLSR Daemon - Interface"), _("The OLSR daemon is an implementation of the Optimized Link State Routing protocol. " + "As such it allows mesh routing for any network equipment. " + "It runs on any wifi card that supports ad-hoc mode and of course on any ethernet device. " + "Visit <a href='http://www.olsr.org'>olsrd.org</a> for help and documentation."));
+		m = new form.Map("olsrd6", _("OLSR Daemon - Interface"), _("The OLSR daemon is an implementation of the Optimized Link State Routing protocol. " + "As such it allows mesh routing for any network equipment. " + "It runs on any wifi card that supports ad-hoc mode and of course on any ethernet device. " + "Visit <a href='http://www.olsr.org'>olsrd.org</a> for help and documentation."));
 
-		m.redirect = luci.dispatcher.build_url("admin/services/olsrd"); //to review again
+		m.redirect = luci.dispatcher.build_url("admin/services/olsrd6"); //to review again
 
-		if (!process.argv[2] || m.uci.get("olsrd", process.argv[2]) !== "Interface") {
+		if (!process.argv[2] || m.uci.get("olsrd6", process.argv[2]) !== "Interface") {
 			window.location.href = m.redirect;
 			return;
 		}
@@ -55,7 +55,7 @@ return view.extend({
 		weight.datatype = "uinteger";
 		weight.placeholder = "0";
 
-		lqmult = i.taboption("general", form.DynamicList, "LinkQualityMult", _("LinkQuality Multiplicator"), _("Multiply routes with the factor given here. Allowed values are between 0.01 and 1.0. " + "It is only used when LQ-Level is greater than 0. Examples:<br />" + "reduce LQ to 192.168.0.1 by half: 192.168.0.1 0.5<br />" + "reduce LQ to all nodes on this interface by 20%: default 0.8"));
+		lqmult = i.taboption("general", form.DynamicList, "LinkQualityMult", _("LinkQuality Multiplicator"), _("Multiply routes with the factor given here. Allowed values are between 0.01 and 1.0. " + "It is only used when LQ-Level is greater than 0. Examples:<br />" + "reduce LQ to fd91:662e:3c58::1 by half: fd91:662e:3c58::1 0.5<br />" + "reduce LQ to all nodes on this interface by 20%: default 0.8"));
 		lqmult.optional = true;
 		lqmult.rmempty = true;
 		lqmult.cast = "table";
@@ -71,8 +71,8 @@ return view.extend({
 					if (!host || !mult) {
 						return [null, _("LQMult requires two values (IP address or 'default' and multiplicator) separated by space.")];
 					}
-					if (!(host === "default" || !/^(\d{1,3}\.){3}\d{1,3}$|^([a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/.test(host))) {
-						return [null, _("Can only be a valid IPv4 or IPv6 address or 'default'")];
+					if (!(host === "default" || !/^([a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/.test(host))) {
+						return [null, _("Can only be a valid IPv6 address or 'default'")];
 					}
 					if (!parseFloat(mult) || parseFloat(mult) > 1 || parseFloat(mult) < 0.01) {
 						return [null, _("Invalid Value for LQMult-Value. Must be between 0.01 and 1.0.")];
@@ -85,20 +85,12 @@ return view.extend({
 			return [value];
 		};
 
-		ip4b = i.taboption("addrs", form.Value, "Ip4Broadcast", _("IPv4 broadcast"), _("IPv4 broadcast address for outgoing OLSR packets. One useful example would be 255.255.255.255. " + 'Default is "0.0.0.0", which triggers the usage of the interface broadcast IP.'));
-		ip4b.optional = true;
-		ip4b.datatype = "ip4addr";
-		ip4b.placeholder = "0.0.0.0";
 
 		ip6m = i.taboption("addrs", form.Value, "IPv6Multicast", _("IPv6 multicast"), _('IPv6 multicast address. Default is "FF02::6D", the manet-router linklocal multicast.'));
 		ip6m.optional = true;
 		ip6m.datatype = "ip6addr";
 		ip6m.placeholder = "FF02::6D";
 
-		ip4s = i.taboption("addrs", form.Value, "IPv4Src", _("IPv4 source"), _('IPv4 src address for outgoing OLSR packages. Default is "0.0.0.0", which triggers usage of the interface IP.'));
-		ip4s.optional = true;
-		ip4s.datatype = "ip4addr";
-		ip4s.placeholder = "0.0.0.0";
 
 		ip6s = i.taboption("addrs", form.Value, "IPv6Src", _("IPv6 source"), _("IPv6 src prefix. OLSRd will choose one of the interface IPs which matches the prefix of this parameter. " + 'Default is "0::/0", which triggers the usage of a not-linklocal interface IP.'));
 		ip6s.optional = true;
