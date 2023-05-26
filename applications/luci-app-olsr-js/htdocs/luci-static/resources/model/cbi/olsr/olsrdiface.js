@@ -16,10 +16,10 @@ return view.extend({
 
 		m.redirect = "admin/services/olsrd"; 
 
-		if (!process.argv[2] || uci.get("olsrd","main", process.argv[2])!== "Interface") {
-			window.location.href = m.redirect;
-			return;
-		}
+		// if (!process.argv[2] || uci.get("olsrd","main", process.argv[2])!== "Interface") {
+		// 	window.location.href = m.redirect;
+		// 	return;
+		// }
 
 		i = m.section(form.NamedSection, arg[1], "Interface", _("Interface"));
 		i.anonymous = true;
