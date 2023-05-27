@@ -8,13 +8,13 @@
 return view.extend({
 	render: function () {
 		if (arg[1]) {
-			mp = new form.Map('olsrd', translate('OLSR - Plugins'));
+			mp = new form.Map('olsrd', _('OLSR - Plugins'));
 
-			p = mp.section(form.TypedSection, 'LoadPlugin', translate('Plugin configuration'));
+			p = mp.section(form.TypedSection, 'LoadPlugin', _('Plugin configuration'));
 			p.depends('library', arg[1]);
 			p.anonymous = true;
 
-			ign = p.option(form.Flag, 'ignore', translate('Enable'));
+			ign = p.option(form.Flag, 'ignore', _('Enable'));
 			ign.enabled = '0';
 			ign.disabled = '1';
 			ign.rmempty = false;
@@ -22,7 +22,7 @@ return view.extend({
 				return uci.get('olsrd', section_id, 'ignore') || '0';
 			};
 
-			lib = p.option(form.DummyValue, 'library', translate('Library'));
+			lib = p.option(form.DummyValue, 'library', _('Library'));
 			lib.default = arg[1];
 
 			function Range(x, y) {
@@ -225,7 +225,7 @@ return view.extend({
 
 			return mp;
 		} else {
-			mpi = new form.Map('olsrd', translate('OLSR - Plugins'));
+			mpi = new form.Map('olsrd', _('OLSR - Plugins'));
 
 			const plugins = {};
 			uci.sections('olsrd', 'LoadPlugin', (section) => {
@@ -246,7 +246,7 @@ return view.extend({
 				}
 			});
 
-			t = mpi.section(TypedSection, 'LoadPlugin', translate('Plugins'));
+			t = mpi.section(TypedSection, 'LoadPlugin', _('Plugins'));
 			t.anonymous = true;
 			t.template = 'cbi/tblsection';
 			t.override_scheme = true;
@@ -255,7 +255,7 @@ return view.extend({
 				var lib = uci.get(section_id, 'library') || '';
 				return '/cgi-bin/luci/admin/services/olsrd/plugins/' + lib;
 			};
-			ign = t.option(Flag, 'ignore', translate('Enabled'));
+			ign = t.option(Flag, 'ignore', _('Enabled'));
 			ign.enabled = '0';
 			ign.disabled = '1';
 			ign.rmempty = false;
@@ -263,7 +263,7 @@ return view.extend({
 				return uci.get(section_id, 'ignore') || '0';
 			}
 
-			t.option(DummyValue, 'library', translate('Library'));
+			t.option(DummyValue, 'library', _('Library'));
 
 			return mpi.render();
 		}
