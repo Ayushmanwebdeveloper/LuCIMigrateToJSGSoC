@@ -45,8 +45,7 @@ return view.extend({
         return E([], {}, [
             E('h2', {}, _('Interfaces')),
 												E('h2', {}, _('Overview of interfaces where OLSR is running')),
-            cbiTable,
-												tableRows
+            cbiTable.append(tableRows)
         ]);      
     }
 })
