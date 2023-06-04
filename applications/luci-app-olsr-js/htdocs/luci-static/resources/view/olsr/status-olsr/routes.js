@@ -39,8 +39,8 @@ return view.extend({
 														'<div class="th cbi-section-table-cell">ETX</div>' +
 														'</div>';
 						
-										for (var idx = 0; idx < info.length; idx++) {
-														var route = info[idx];
+										for (var idx = 0; idx < rv.length; idx++) {
+														var route = rv[idx];
 						
 														s += '<div class="tr cbi-section-table-row cbi-rowstyle-' + (1 + (idx % 2)) + ' proto-' + route.proto + '">' +
 																		'<div class="td cbi-section-table-cell left">' + route.dest + '/' + route.genmask + '</div>' +
