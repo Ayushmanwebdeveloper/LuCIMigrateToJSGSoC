@@ -1,19 +1,28 @@
-#!/bin/sh
-. /usr/share/libubox/jshn.sh
-
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 otable v4_port v6_port"
-    exit 1
-fi
-
-otable="$1"
-v4_port="$2"
-v6_port="$3"
-
-jsonreq4=$(echo "/${otable}" | nc 127.0.0.1 ${v4_port} | sed -n '/^[}{ ]/p' 2>/dev/null)
-jsonreq6=$(echo "/${otable}" | nc ::1 ${v6_port} | sed -n '/^[}{ ]/p' 2>/dev/null)
-
-json_init
-json_add_string "jsonreq4" "$jsonreq4"
-json_add_string "jsonreq6" "$jsonreq6"
-json_dump
+#!/bin/sh                                                                                                                                                                
+. /usr/share/libubox/jshn.sh                                                                                                                                             
+. /lib/functions.sh                                                                                                                                                      
+                                                                                                                                                                         
+case "$1" in                                                                                                                                                             
+  list)                                                                                                                                                                  
+    echo '{ "getjsondata": { } }'                                                                                                                                        
+    ;;                                                                                                                                                                   
+  call)                                                                                                                                                                  
+    case "$2" in                                                                                                                                                         
+      getjsondata)                                                                                                                                                       
+        json_init                                                                                                                                                        
+        json_load "$(cat)"                                                                                                                                               
+        json_get_var otable  otable                                                                                                                                       
+        json_get_var v4_port v4_port                                                                                                                                     
+        json_get_var v6_port v6_port                                                                                                                                     
+                                                                                                                                                                         
+        jsonreq4=$(echo "/${otable}" | nc 127.0.0.1 "${v4_port}" | sed -n '/^[}{ ]/p' 2>/dev/null)                                                                       
+        jsonreq6=$(echo "/${otable}" | nc ::1 "${v6_port}" | sed -n '/^[}{ ]/p' 2>/dev/null)                                                                             
+                                                                                                                                                                         
+        json_init                                                                                                                                                        
+        json_add_string "jsonreq4" "$jsonreq4"                                                                                                                           
+        json_add_string "jsonreq6" "$jsonreq6"                                                                                                                           
+        json_dump                                                                                                                                                        
+        ;;                                                                                                                                                               
+    esac                                                                                                                                                                 
+    ;;                                                                                                                                                                   
+esac  
