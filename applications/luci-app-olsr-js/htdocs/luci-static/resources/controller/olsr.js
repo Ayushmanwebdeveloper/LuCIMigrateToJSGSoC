@@ -65,8 +65,8 @@ function fetch_jsoninfo(otable) {
 
 		return [data4, has_v4, has_v6, false];
 	})
-	.catch(function(error) {
-		console.error(error);
+	.catch(function(err) {
+		console.error(err);
 		return [null, 0, 0, true];
 });
 }

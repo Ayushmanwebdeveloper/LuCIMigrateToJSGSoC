@@ -4,7 +4,13 @@
                                                                                                                                                                          
 case "$1" in                                                                                                                                                             
   list)                                                                                                                                                                  
-    echo '{ "getjsondata": { } }'                                                                                                                                        
+    json_init
+    json_add_object "getjsondata"
+    json_add_string 'otable' 'String'
+    json_add_int 'v4_port' 'Integer'
+    json_add_int 'v6_port' 'Integer'
+    json_close_object
+    json_dump
     ;;                                                                                                                                                                   
   call)                                                                                                                                                                  
     case "$2" in                                                                                                                                                         
