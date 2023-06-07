@@ -10,42 +10,63 @@ return view.extend({
         ])
     },
     render: () => {
-					var i=1;
-			  var cbiTable=E('div', { 'class': 'table cbi-section-table' }, [
-						E('div', { 'class': 'tr' }, [
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('Device')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('State')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('MTU')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('WLAN')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('Source address')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('Netmask')),
-								E('div', { 'class': 'th cbi-section-table-cell' }, _('Broadcast address'))
-						]),
-				]);
+					var tableRows = [];
+					var i = 1;
+					
+					for (var k = 0; k < iface.length; k++) {
+							var iface = iface[k];
+					
+							var tr = E('div', { 'class': 'tr cbi-section-table-row cbi-rowstyle-' + i + ' proto-' + iface.proto }, [
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.interface),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.name),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.up ? _('up') : _('down')),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.mtu),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.wireless ? _('yes') : _('no')),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.ipAddress),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.ipv4Address !== '0.0.0.0' ? iface.olsrInterface.ipv4Netmask : ''),
+									E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.ipv4Address !== '0.0.0.0' ? iface.olsrInterface.ipv4Broadcast : iface.olsrInterface.ipv6Multicast)
+							]);
+					
+							tableRows.push(tr);
+							i = (i % 2) + 1;
+					}
+					
+					var table = E('div', { 'class': 'table cbi-section-table' }, [
+							E('div', { 'class': 'tr' }, [
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Device')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('State')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('MTU')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('WLAN')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Source address')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Netmask')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Broadcast address'))
+							]),
+							tableRows
+					]);
+					
+					var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
+							E('legend', {}, _('Overview of interfaces where OLSR is running')),
+							table
+					]);
+					
+					var h2 = E('h2', { 'name': 'content' }, _('Interfaces'));
+					var divToggleButtons = E('div', { 'id': 'togglebuttons' });
+					var statusOlsrCommonJs = null;
 
-				var tableRows = [];
-				for (var k = 0; k < iface.length; k++) {
-						var ifaceRow = iface[k];
-						var tr = E('div', { 'class': 'tr cbi-section-table-row cbi-rowstyle-' + i + ' proto-' + ifaceRow.proto }, [
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.interface),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.name),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.olsrInterface.up ? luci.i18n.translate('up') : luci.i18n.translate('down')),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.olsrInterface.mtu),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.olsrInterface.wireless ? luci.i18n.translate('yes') : luci.i18n.translate('no')),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.olsrInterface.ipAddress),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.olsrInterface.ipv4Address !== '0.0.0.0' ? ifaceRow.olsrInterface.ipv4Netmask : ''),
-								E('div', { 'class': 'td cbi-section-table-cell left' }, ifaceRow.olsrInterface.ipv4Address !== '0.0.0.0' ? ifaceRow.olsrInterface.ipv4Broadcast : ifaceRow.olsrInterface.ipv6Multicast)
-						]);
-						tableRows.push(tr);
-						i = (i % 2) + 1;
-				}
-				
-				
-        return E([], {}, [
-            E('h2', {}, _('Interfaces')),
-												E('h2', {}, _('Overview of interfaces where OLSR is running')),
-            cbiTable.append(tableRows)
-        ]);      
+					if (has_v4 && has_v6) {
+						statusOlsrCommonJs=	E('script', { 'type': 'text/javascript', 'src': L.resource('common/common_js.js') });
+					}
+					
+					
+					var result = E([], {}, [
+							h2,
+							divToggleButtons,
+							fieldset,
+							statusOlsrCommonJs
+					]);
+					
+					return result;
+									
     }
 })
