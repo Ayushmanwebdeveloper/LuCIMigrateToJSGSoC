@@ -3,7 +3,34 @@
 'require view';
 'require poll'
 
-import { etx_color, snr_colors } from "./olsrtools";
+function etx_color(etx) {
+	let color = "#bb3333";
+	if (etx === 0) {
+			color = "#bb3333";
+	} else if (etx < 2) {
+			color = "#00cc00";
+	} else if (etx < 4) {
+			color = "#ffcb05";
+	} else if (etx < 10) {
+			color = "#ff6600";
+	}
+	return color;
+}
+
+function snr_colors(snr) {
+	let color = "#bb3333";
+	if (snr === 0) {
+			color = "#bb3333";
+	} else if (snr > 30) {
+			color = "#00cc00";
+	} else if (snr > 20) {
+			color = "#ffcb05";
+	} else if (snr > 5) {
+			color = "#ff6600";
+	}
+	return color;
+}
+
 return view.extend({
     load: () => {
         return Promise.all([
@@ -160,8 +187,81 @@ var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
 
 var h2 = E('h2', { 'name': 'content' }, _('OLSR connections'));
 var divToggleButtons = E('div', { 'id': 'togglebuttons' });
-var statusOlsrLegend;
-var statusOlsrCommonJs;
+var statusOlsrLegend=E('div', {}, [
+	E('h3', {}, [_('Legend') + ':']),
+	E('ul', {}, [
+			E('li', {}, [
+					E('strong', {}, [_('LQ: ')]),
+					_('Success rate of packages received from the neighbour')
+			]),
+			E('li', {}, [
+					E('strong', {}, [_('NLQ: ')]),
+					_('Success rate of packages sent to the neighbour')
+			]),
+			E('li', {}, [
+					E('strong', {}, [_('ETX: ')]),
+					_('Expected retransmission count')
+			]),
+			E('li', { style: 'list-style: none' }, [
+					E('ul', {}, [
+							E('li', {}, [
+									E('strong', { style: 'color:#00cc00' }, [_('Green')]),
+									':',
+									_('Very good (ETX < 2)')
+							]),
+							E('li', {}, [
+									E('strong', { style: 'color:#ffcb05' }, [_('Yellow')]),
+									':',
+									_('Good (2 < ETX < 4)')
+							]),
+							E('li', {}, [
+									E('strong', { style: 'color:#ff6600' }, [_('Orange')]),
+									':',
+									_('Still usable (4 < ETX < 10)')
+							]),
+							E('li', {}, [
+									E('strong', { style: 'color:#bb3333' }, [_('Red')]),
+									':',
+									_('Bad (ETX > 10)')
+							])
+					])
+			]),
+			E('li', {}, [
+					E('strong', {}, [_('SNR: ')]),
+					_('Signal Noise Ratio in dB')
+			]),
+			E('li', { style: 'list-style: none' }, [
+					E('ul', {}, [
+							E('li', {}, [
+									E('strong', { style: 'color:#00cc00' }, [_('Green')]),
+									':',
+									_('Very good (SNR > 30)')
+							]),
+							E('li', {}, [
+									E('strong', { style: 'color:#ffcb05' }, [_('Yellow')]),
+									':',
+									_('Good (30 > SNR > 20)')
+							]),
+							E('li', {}, [
+									E('strong', { style: 'color:#ff6600' }, [_('Orange')]),
+									':',
+									_('Still usable (20 > SNR > 5)')
+							]),
+							E('li', {}, [
+									E('strong', { style: 'color:#bb3333' }, [_('Red')]),
+									':',
+									_('Bad (SNR < 5)')
+							])
+					])
+			])
+	])
+]);
+
+var statusOlsrCommonJs = null;
+
+if (has_v4 && has_v6) {
+	statusOlsrCommonJs=	E('script', { 'type': 'text/javascript', 'src': L.resource('common/common_js.js') });
+}
 
 var result = E([], {}, [
   h2,

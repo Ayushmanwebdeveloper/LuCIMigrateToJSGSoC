@@ -17,9 +17,9 @@ return view.extend({
 							var mid = mids[k];
 							var aliases = '';
 							for (var j = 0; j < mid.aliases.length; j++) {
-									var alias = mid.aliases[j];
+									var v = mid.aliases[j];
 									var sep = aliases === '' ? '' : ', ';
-									aliases = alias.ipAddress + sep + aliases;
+									aliases = v.ipAddress + sep + aliases;
 							}
 					
 							var host = mid.main.ipAddress;
@@ -51,11 +51,22 @@ return view.extend({
 							table
 					]);
 					
-				
-				
-        return E([], {}, [
-            E('h2', {}, _('Active MID announcements')),
-												fieldset
-        ]);      
+					var h2 = E('h2', { 'name': 'content' }, _('Active MID announcements'));
+					var divToggleButtons = E('div', { 'id': 'togglebuttons' });
+					var statusOlsrCommonJs = null;
+
+					if (has_v4 && has_v6) {
+						statusOlsrCommonJs=	E('script', { 'type': 'text/javascript', 'src': L.resource('common/common_js.js') });
+					}
+					
+					var result = E([], {}, [
+							h2,
+							divToggleButtons,
+							fieldset,
+							statusOlsrCommonJs
+					]);
+					
+					return result;
+								
     }
 })

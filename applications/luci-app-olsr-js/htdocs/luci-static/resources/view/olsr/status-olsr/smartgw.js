@@ -2,7 +2,7 @@
 'require uci';
 'require view';
 'require poll';
-import { etx_color, snr_colors } from "./olsrtools";
+
 return view.extend({
     load: () => {
         return Promise.all([
@@ -144,15 +144,17 @@ if (smartgwdiv) {
 					
 							var h2 = E('h2', { 'name': 'content' }, _('SmartGW announcements'));
 							var divToggleButtons = E('div', { 'id': 'togglebuttons' });
-							var statusOlsrCommonJs;
-							var footer;
+							var statusOlsrCommonJs = null;
+					
+					  if (has_v4 && has_v6) {
+					   	statusOlsrCommonJs=	E('script', { 'type': 'text/javascript', 'src': L.resource('common/common_js.js') });
+					  }
 					
 							var result = E([], {}, [
 									h2,
 									divToggleButtons,
 									fieldset,
-									statusOlsrCommonJs,
-									footer
+									statusOlsrCommonJs
 							]);
 					
 							return result;
