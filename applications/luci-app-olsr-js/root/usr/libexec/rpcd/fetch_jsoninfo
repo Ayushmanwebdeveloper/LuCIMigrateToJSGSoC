@@ -10,6 +10,8 @@ case "$1" in
     json_add_int 'v4_port' 'Integer'
     json_add_int 'v6_port' 'Integer'
     json_close_object
+				json_add_object "hasipip"
+				json_close_object
     json_dump
     ;;                                                                                                                                                                   
   call)                                                                                                                                                                  
@@ -17,7 +19,7 @@ case "$1" in
       getjsondata)                                                                                                                                                       
         json_init                                                                                                                                                        
         json_load "$(cat)"                                                                                                                                               
-        json_get_var otable  otable                                                                                                                                       
+        json_get_var otable  otable                                                                                                                                      
         json_get_var v4_port v4_port                                                                                                                                     
         json_get_var v6_port v6_port                                                                                                                                     
                                                                                                                                                                          
@@ -28,6 +30,10 @@ case "$1" in
         json_add_string "jsonreq4" "$jsonreq4"                                                                                                                           
         json_add_string "jsonreq6" "$jsonreq6"                                                                                                                           
         json_dump                                                                                                                                                        
+        ;;
+					hasipip)
+        result=$(ls /etc/modules.d/ | grep -E "[0-9]*-ipip")
+        echo "$result"
         ;;                                                                                                                                                               
     esac                                                                                                                                                                 
     ;;                                                                                                                                                                   
