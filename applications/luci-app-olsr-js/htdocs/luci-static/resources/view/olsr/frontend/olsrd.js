@@ -4,16 +4,21 @@
 "require	fs";
 "require	uci";
 
+var callHasIpIp = rpc.declare({
+	object: 'olsrinfo',
+	method: 'hasipip'
+});
+
 return view.extend({
 	render: function () {
 		var m, s, o;
   
 		var has_ipip;
-		fs.exec('ls /etc/modules.d/ | grep -E "[0-9]*-ipip"')
+		callHasIpIp()
 			.then(function (res) {
 				var json = JSON.parse(res);
 				var output = json.result;
-				has_ipip = output.length > 0;
+				has_ipip = output.trim().length > 0;
 				console.log(has_ipip);
 			})
 			.catch(function (err) {
