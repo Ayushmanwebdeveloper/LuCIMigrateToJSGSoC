@@ -8,10 +8,12 @@ return view.extend({
 	render: function () {
 		var m, s, o;
 
+		var has_ipip;
 		fs.exec('ls /etc/modules.d/ | grep -E "[0-9]*-ipip"')
 			.then(function (res) {
-				var output = res.stdout.trim();
-				var has_ipip = output.length > 0;
+				var json = JSON.parse(res);
+				var output = json.result;
+				has_ipip = output.length > 0;
 				console.log(has_ipip);
 			})
 			.catch(function (err) {
