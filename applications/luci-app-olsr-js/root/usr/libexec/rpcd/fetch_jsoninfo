@@ -33,7 +33,9 @@ case "$1" in
         ;;
 					hasipip)
         result=$(ls /etc/modules.d/ | grep -E "[0-9]*-ipip")
-        echo "$result"
+        json_init
+        json_add_string "result" "$result"
+        json_dump
         ;;                                                                                                                                                               
     esac                                                                                                                                                                 
     ;;                                                                                                                                                                   
