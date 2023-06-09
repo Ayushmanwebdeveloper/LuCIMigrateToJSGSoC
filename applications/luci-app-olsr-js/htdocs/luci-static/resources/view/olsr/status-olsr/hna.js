@@ -2,17 +2,72 @@
 'require uci';
 'require view';
 'require poll'
+'require network';
 
 
 return view.extend({
-    load: () => {
+
+	action_hna: function() {
+  return new Promise(function(resolve, reject) {
+    fetch_jsoninfo('hna')
+      .then(function([data, has_v4, has_v6, error]) {
+        if (error) {
+          reject(error);
+        }
+
+        var resolve = uci.get("luci_olsr", "general", "resolve");
+
+        function compare(a, b) {
+          if (a.proto === b.proto) {
+            return a.genmask < b.genmask;
+          } else {
+            return a.proto < b.proto;
+          }
+        }
+
+        for (var k = 0; k < data.length; k++) {
+          var v = data[k];
+          if (resolve === "1") {
+            hostname = nixio.getnameinfo(v.gateway, null, 100);
+            if (hostname) {
+              v.hostname = hostname;
+            }
+          }
+          if (v.validityTime) {
+            v.validityTime = parseInt((v.validityTime / 1000).toFixed(0));
+          }
+        }
+
+        data.sort(compare);
+
+        var result = { hna: data, has_v4: has_v4, has_v6: has_v6 };
+        resolve(result);
+      })
+      .catch(function(err) {
+        reject(err);
+      });
+  });
+},
+	
+
+ load: () => {
         return Promise.all([
             uci.load('olsrd'),
             uci.load('system')    
         ])
     },
     render: () => {
-				
+					var hna;
+					var has_v4;
+					var has_v6;
+					this.action_hna().then(function(result) {
+						hna = result.hna;
+						has_v4 = result.has_v4;
+						has_v6 = result.has_v6;
+					}).catch(function(error) {
+					 console.error(error);
+				});
+
 					var i = 1;
 
 					var rv = [];
