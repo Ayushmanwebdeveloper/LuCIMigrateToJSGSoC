@@ -90,7 +90,7 @@ return view.extend({
           reject(error);
         }
 
-        var resolve = uci.get("luci_olsr", "general", "resolve");
+        var resolveVal = uci.get("luci_olsr", "general", "resolve");
 
         function compare(a, b) {
           if (a.proto === b.proto) {
@@ -99,19 +99,23 @@ return view.extend({
             return a.proto < b.proto;
           }
         }
-
-       var modifiedData = data.map(function(v) {
-									if (resolve === "1") {
-											var hostname = hosthints.getHostnameByIPAddr(v.gateway);
-											if (hostname) {
-													v.hostname = hostname;
-											}
-									}
-									if (v.validityTime) {
-											v.validityTime = parseInt((v.validityTime / 1000).toFixed(0));
-									}
-									return v;
-							});
+								network.getHostHints().then(function(hosthints) {
+										var modifiedData = data.map(function(v) {
+												if (resolveVal === "1") {
+														var hostname = hosthints.getHostnameByIPAddr(v.gateway);
+														if (hostname) {
+																v.hostname = hostname;
+														}
+												}
+												if (v.validityTime) {
+														v.validityTime = parseInt((v.validityTime / 1000).toFixed(0));
+												}
+												return v;
+										});
+								}).catch(function(err) {
+									 var modifiedData = data;
+										console.error(err);
+								});
 							
 
 							modifiedData.sort(compare);
@@ -201,8 +205,8 @@ return view.extend({
 					var tableRows = [];
 					var i = 1;
 					
-					for (var k = 0; k < hna.length; k++) {
-							var route = hna[k];
+					for (var k = 0; k < hna_res.length; k++) {
+							var route = hna_res[k];
 					
 							var tr = E('div', { 'class': 'tr cbi-section-table-row cbi-rowstyle-' + i + ' proto-' + route.proto }, [
 									E('div', { 'class': 'td cbi-section-table-cell left' }, route.destination + '/' + route.genmask),

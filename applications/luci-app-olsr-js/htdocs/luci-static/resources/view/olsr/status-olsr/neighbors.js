@@ -108,6 +108,48 @@ return view.extend({
 						});
 		});
 	},
+	action_hna: function() {
+  return new Promise(function(resolve, reject) {
+    this.fetch_jsoninfo('hna')
+      .then(function([data, has_v4, has_v6, error]) {
+        if (error) {
+          reject(error);
+        }
+
+        var resolveVal = uci.get("luci_olsr", "general", "resolve");
+
+        function compare(a, b) {
+          if (a.proto === b.proto) {
+            return a.genmask < b.genmask;
+          } else {
+            return a.proto < b.proto;
+          }
+        }
+
+       var modifiedData = data.map(function(v) {
+									if (resolveVal === "1") {
+											var hostname = hosthints.getHostnameByIPAddr(v.gateway);
+											if (hostname) {
+													v.hostname = hostname;
+											}
+									}
+									if (v.validityTime) {
+											v.validityTime = parseInt((v.validityTime / 1000).toFixed(0));
+									}
+									return v;
+							});
+							
+
+							modifiedData.sort(compare);
+
+        var result = { hna: modifiedData, has_v4: has_v4, has_v6: has_v6 };
+        resolve(result);
+      })
+      .catch(function(err) {
+        reject(err);
+      });
+  });
+},
     load: () => {
         return Promise.all([
             uci.load('olsrd'),
@@ -203,8 +245,8 @@ for (var k = 0; k < links.length; k++) {
     link.linkCost = 0;
   }
 
-  color = olsrtools.etx_color(link.linkCost);
-  snr_color = olsrtools.snr_colors(link.snr);
+  color = etx_color(link.linkCost);
+  snr_color = snr_colors(link.snr);
 
   if (link.snr === 0) {
     link.snr = '?';

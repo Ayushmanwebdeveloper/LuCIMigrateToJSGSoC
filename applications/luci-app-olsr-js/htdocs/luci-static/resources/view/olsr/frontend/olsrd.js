@@ -4,17 +4,18 @@
 "require	fs";
 "require	uci";
 
-var callHasIpIp = rpc.declare({
-	object: 'olsrinfo',
-	method: 'hasipip'
-});
 
 return view.extend({
+	
+	callHasIpIp: rpc.declare({
+		object: 'olsrinfo',
+		method: 'hasipip'
+	}),
 	render: function () {
 		var m, s, o;
   
 		var has_ipip;
-		callHasIpIp()
+		this.callHasIpIp()
 			.then(function (res) {
 				var json = JSON.parse(res);
 				var output = json.result;

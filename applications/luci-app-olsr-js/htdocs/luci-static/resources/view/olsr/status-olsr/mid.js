@@ -79,6 +79,33 @@ return view.extend({
 						});
 		});
 	},
+	action_mid: function() {
+  return new Promise(function(resolve, reject) {
+    this.fetch_jsoninfo('mid')
+      .then(function([data, has_v4, has_v6, error]) {
+        if (error) {
+          reject(error);
+        }
+
+
+        function compare(a, b) {
+          if (a.proto === b.proto) {
+            return a.main.ipAddress < b.main.ipAddress;
+          } else {
+            return a.proto < b.proto;
+          }
+        }
+
+        data.sort(compare);
+
+        var result = { mids: data, has_v4: has_v4, has_v6: has_v6 };
+        resolve(result);
+      })
+      .catch(function(err) {
+        reject(err);
+      });
+  });
+},
     load: () => {
         return Promise.all([
             uci.load('olsrd'),
@@ -86,11 +113,22 @@ return view.extend({
         ])
     },
     render: () => {
+					var mids_res;
+					var has_v4;
+					var has_v6;
+
+					this.action_mid().then(function(result) {
+						mids_res = result.mids;
+						has_v4 = result.has_v4;
+						has_v6 = result.has_v6;
+					}).catch(function(error) {
+					 console.error(error);
+				});
 					var tableRows = [];
 					var i = 1;
 					
-					for (var k = 0; k < mids.length; k++) {
-							var mid = mids[k];
+					for (var k = 0; k < mids_res.length; k++) {
+							var mid = mids_res[k];
 							var aliases = '';
 							for (var j = 0; j < mid.aliases.length; j++) {
 									var v = mid.aliases[j];

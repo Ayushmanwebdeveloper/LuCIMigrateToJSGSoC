@@ -2,6 +2,7 @@
 'require uci';
 'require view';
 'require poll';
+'require network';
 
 function etx_color(etx) {
 	let color = "#bb3333";
@@ -94,6 +95,50 @@ return view.extend({
 						});
 		});
 	},
+	action_routes: function() {
+  return new Promise(function(resolve, reject) {
+    this.fetch_jsoninfo('routes')
+      .then(function([data, has_v4, has_v6, error]) {
+        if (error) {
+          reject(error);
+        }
+
+        var resolveVal = uci.get("luci_olsr", "general", "resolve");
+
+        function compare(a, b) {
+          if (a.proto === b.proto) {
+            return a.rtpMetricCost < b.rtpMetricCost;
+          } else {
+            return a.proto < b.proto;
+          }
+        }
+
+								network.getHostHints().then(function(hosthints) {
+									var modifiedData = data.map(function(v) {
+											if (resolveVal === "1") {
+													var hostname = hosthints.getHostnameByIPAddr(v.gateway);
+													if (hostname) {
+															v.hostname = hostname;
+													}
+											}
+											return v;
+									});
+							}).catch(function(err) {
+									var modifiedData = data;
+									console.error(err);
+							});
+							
+
+							modifiedData.sort(compare);
+
+        var result = { routes: modifiedData, has_v4: has_v4, has_v6: has_v6 };
+        resolve(result);
+      })
+      .catch(function(err) {
+        reject(err);
+      });
+  });
+},
     load: () => {
         return Promise.all([
             uci.load('olsrd'),
@@ -101,10 +146,20 @@ return view.extend({
         ])
     },
     render: () => {
-					
+					var routes_res;
+					var has_v4;
+					var has_v6;
+
+					this.action_routes().then(function(result) {
+						routes_res = result.routes;
+						has_v4 = result.has_v4;
+						has_v6 = result.has_v6;
+					}).catch(function(error) {
+					 console.error(error);
+				});
 					var rv = [];
-					for (var k = 0; k < routes.length; k++) {
-									var route = routes[k];
+					for (var k = 0; k < routes_res.length; k++) {
+									var route = routes_res[k];
 									var ETX = (parseFloat(route.etx) || 0).toFixed(3);
 									rv.push({
 													hostname: route.hostname,
@@ -114,7 +169,7 @@ return view.extend({
 													interface: route.networkInterface,
 													metric: route.metric,
 													etx: ETX,
-													color: olsrtools.etx_color(parseFloat(ETX))
+													color: etx_color(parseFloat(ETX))
 									});
 					}
 					poll.add(function(rv)
@@ -163,10 +218,10 @@ return view.extend({
 					var tableRows = [];
 					var i = 1;
 					
-					for (var k = 0; k < routes.length; k++) {
-							var route = routes[k];
+					for (var k = 0; k < routes_res.length; k++) {
+							var route = routes_res[k];
 							var ETX = parseInt(route.etx) || 0;
-							var color = olsrtools.etx_color(ETX);
+							var color = etx_color(ETX);
 					
 							var tr = E('div', { 'class': 'tr cbi-section-table-row cbi-rowstyle-' + i + ' proto-' + route.proto }, [
 									E('div', { 'class': 'td cbi-section-table-cell left' }, route.destination + '/' + route.genmask),

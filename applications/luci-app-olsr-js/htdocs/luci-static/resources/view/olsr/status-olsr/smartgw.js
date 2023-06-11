@@ -80,6 +80,34 @@ return view.extend({
 						});
 		});
 	},
+	action_smartgw: function() {
+  return new Promise(function(resolve, reject) {
+    this.fetch_jsoninfo('gateways')
+      .then(function([data, has_v4, has_v6, error]) {
+        if (error) {
+          reject(error);
+        }
+
+        function compare(a, b) {
+          if (a.proto === b.proto) {
+            return a.cost < b.cost;
+          } else {
+            return a.proto < b.proto;
+          }
+        }
+
+      
+							data.ipv4.sort(compare);
+							data.ipv6.sort(compare);
+
+        var result = { gws: data, has_v4: has_v4, has_v6: has_v6 };
+        resolve(result);
+      })
+      .catch(function(err) {
+        reject(err);
+      });
+  });
+},
     load: () => {
         return Promise.all([
             uci.load('olsrd'),
@@ -87,6 +115,17 @@ return view.extend({
         ])
     },
     render: () => {
+					var gws_res;
+					var has_v4;
+					var has_v6;
+
+					this.action_smartgw().then(function(result) {
+						gws_res = result.gws;
+						has_v4 = result.has_v4;
+						has_v6 = result.has_v6;
+					}).catch(function(error) {
+					 console.error(error);
+				});
 					var has_smartgw;
 					uci.sections("olsrd", "olsrd", function(s) {
 						if (s.SmartGateway && s.SmartGateway === "yes") {
@@ -95,8 +134,8 @@ return view.extend({
 				});
 				
 						var rv = [];
-						for (var k = 0; k < gws.ipv4.length; k++) {
-								var gw = gws.ipv4[k];
+						for (var k = 0; k < gws_res.ipv4.length; k++) {
+								var gw = gws_res.ipv4[k];
 								gw.cost = parseFloat(gw.cost) / 1024 || 0;
 								if (gw.cost >= 100) {
 										gw.cost = 0;
@@ -169,8 +208,8 @@ if (smartgwdiv) {
 					var i = 1;
 					
 					if (has_smartgw) {
-							for (var k = 0; k < gws.ipv4.length; k++) {
-									var gw = gws.ipv4[k];
+							for (var k = 0; k < gws_res.ipv4.length; k++) {
+									var gw = gws_res.ipv4[k];
 									gw.cost = parseInt(gw.cost) / 1024 || 0;
 									if (gw.cost >= 100) {
 											gw.cost = 0;
