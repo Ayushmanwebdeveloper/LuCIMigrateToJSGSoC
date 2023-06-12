@@ -3,17 +3,46 @@
 		"description": "Grant UCI access for luci-app-olsr",
 		"read": {
 			"ubus": {
-				"olsrinfo": [ "getjsondata", "hasipip" ],
-				"luci": [ "setInitAction" ]
+				"uci": [
+					"get"
+				],
+				"luci-rpc": [
+					"*"
+				],
+				"system": [
+					"info",
+					"board"
+				],
+				"olsrinfo": [
+					"getjsondata",
+					"hasipip"
+				],
+				"luci": [
+					"setInitAction"
+				]
 			},
 			"file": {
-				"/etc/modules.d/*": [ "list", "read" ],
-				"/etc/modules.d": [ "list", "read" ]
-  },
-			"uci": [ "luci_olsr", "olsrd", "olsrd6" ]
+				"/etc/modules.d/*": [
+					"list",
+					"read"
+				],
+				"/etc/modules.d": [
+					"list",
+					"read"
+				]
+			},
+			"uci": [
+				"luci_olsr",
+				"olsrd",
+				"olsrd6"
+			]
 		},
 		"write": {
-			"uci": [ "luci_olsr", "olsrd", "olsrd6" ]
+			"uci": [
+				"luci_olsr",
+				"olsrd",
+				"olsrd6"
+			]
 		}
 	}
 }

@@ -13,7 +13,7 @@ return view.extend({
 			}
 		}
 
-		m = new form.Map("olsrd6", _("OLSR Daemon - Interface"), _("The OLSR daemon is an implementation of the Optimized Link State Routing protocol. " + "As such it allows mesh routing for any network equipment. " + "It runs on any wifi card that supports ad-hoc mode and of course on any ethernet device. " + "Visit <a href='http://www.olsr.org'>olsrd.org</a> for help and documentation."));
+		var 	m = new form.Map("olsrd6", _("OLSR Daemon - Interface"), _("The OLSR daemon is an implementation of the Optimized Link State Routing protocol. " + "As such it allows mesh routing for any network equipment. " + "It runs on any wifi card that supports ad-hoc mode and of course on any ethernet device. " + "Visit <a href='http://www.olsr.org'>olsrd.org</a> for help and documentation."));
 
 		m.redirect = "admin/services/olsrd6";
 
@@ -22,7 +22,7 @@ return view.extend({
 		// 	return;
 		// }
 
-		i = m.section(form.NamedSection, arg[1], "Interface", _("Interface"));
+		var 	i = m.section(form.NamedSection, arg[1], "Interface", _("Interface"));
 		i.anonymous = true;
 		i.addremove = false;
 
@@ -30,7 +30,7 @@ return view.extend({
 		i.tab("addrs", _("IP Addresses"));
 		i.tab("timing", _("Timing and Validity"));
 
-		ign = i.taboption("general", form.Flag, "ignore", _("Enable"), _("Enable this interface."));
+		var 	ign = i.taboption("general", form.Flag, "ignore", _("Enable"), _("Enable this interface."));
 		ign.enabled = "0";
 		ign.disabled = "1";
 		ign.rmempty = false;
@@ -39,24 +39,24 @@ return view.extend({
 			return Flag.cfgvalue(section_id) || "0";
 		};
 
-		network = i.taboption("general", form.Value, "interface", _("Network"), _("The interface OLSRd should serve."));
+		var 	network = i.taboption("general", form.Value, "interface", _("Network"), _("The interface OLSRd should serve."));
 
 		network.template = "cbi/network_netlist";
 		network.widget = "radio";
 		network.nocreate = true;
 
-		mode = i.taboption("general", form.ListValue, "Mode", _("Mode"), _("Interface mode is used to prevent unnecessary packet forwarding on switched ethernet interfaces. " + 'Valid modes are "mesh" and "ether". Default is "mesh".'));
+		var 	mode = i.taboption("general", form.ListValue, "Mode", _("Mode"), _("Interface mode is used to prevent unnecessary packet forwarding on switched ethernet interfaces. " + 'Valid modes are "mesh" and "ether". Default is "mesh".'));
 		mode.value("mesh");
 		mode.value("ether");
 		mode.optional = true;
 		mode.rmempty = true;
 
-		weight = i.taboption("general", form.Value, "Weight", _("Weight"), _("When multiple links exist between hosts the weight of interface is used to determine the link to use. " + "Normally the weight is automatically calculated by olsrd based on the characteristics of the interface, " + "but here you can specify a fixed value. Olsrd will choose links with the lowest value.<br />" + "<b>Note:</b> Interface weight is used only when LinkQualityLevel is set to 0. " + "For any other value of LinkQualityLevel, the interface ETX value is used instead."));
+		var 	weight = i.taboption("general", form.Value, "Weight", _("Weight"), _("When multiple links exist between hosts the weight of interface is used to determine the link to use. " + "Normally the weight is automatically calculated by olsrd based on the characteristics of the interface, " + "but here you can specify a fixed value. Olsrd will choose links with the lowest value.<br />" + "<b>Note:</b> Interface weight is used only when LinkQualityLevel is set to 0. " + "For any other value of LinkQualityLevel, the interface ETX value is used instead."));
 		weight.optional = true;
 		weight.datatype = "uinteger";
 		weight.placeholder = "0";
 
-		lqmult = i.taboption("general", form.DynamicList, "LinkQualityMult", _("LinkQuality Multiplicator"), _("Multiply routes with the factor given here. Allowed values are between 0.01 and 1.0. " + "It is only used when LQ-Level is greater than 0. Examples:<br />" + "reduce LQ to fd91:662e:3c58::1 by half: fd91:662e:3c58::1 0.5<br />" + "reduce LQ to all nodes on this interface by 20%: default 0.8"));
+		var 	lqmult = i.taboption("general", form.DynamicList, "LinkQualityMult", _("LinkQuality Multiplicator"), _("Multiply routes with the factor given here. Allowed values are between 0.01 and 1.0. " + "It is only used when LQ-Level is greater than 0. Examples:<br />" + "reduce LQ to fd91:662e:3c58::1 by half: fd91:662e:3c58::1 0.5<br />" + "reduce LQ to all nodes on this interface by 20%: default 0.8"));
 		lqmult.optional = true;
 		lqmult.rmempty = true;
 		lqmult.cast = "table";
@@ -87,60 +87,60 @@ return view.extend({
 		};
 
 
-		ip6m = i.taboption("addrs", form.Value, "IPv6Multicast", _("IPv6 multicast"), _('IPv6 multicast address. Default is "FF02::6D", the manet-router linklocal multicast.'));
+		var 	ip6m = i.taboption("addrs", form.Value, "IPv6Multicast", _("IPv6 multicast"), _('IPv6 multicast address. Default is "FF02::6D", the manet-router linklocal multicast.'));
 		ip6m.optional = true;
 		ip6m.datatype = "ip6addr";
 		ip6m.placeholder = "FF02::6D";
 
 
-		ip6s = i.taboption("addrs", form.Value, "IPv6Src", _("IPv6 source"), _("IPv6 src prefix. OLSRd will choose one of the interface IPs which matches the prefix of this parameter. " + 'Default is "0::/0", which triggers the usage of a not-linklocal interface IP.'));
+		var 	ip6s = i.taboption("addrs", form.Value, "IPv6Src", _("IPv6 source"), _("IPv6 src prefix. OLSRd will choose one of the interface IPs which matches the prefix of this parameter. " + 'Default is "0::/0", which triggers the usage of a not-linklocal interface IP.'));
 		ip6s.optional = true;
 		ip6s.datatype = "ip6addr";
 		ip6s.placeholder = "0::/0";
 
-		hi = i.taboption("timing", form.Value, "HelloInterval", _("Hello interval"));
+		var 	hi = i.taboption("timing", form.Value, "HelloInterval", _("Hello interval"));
 		hi.optional = true;
 		hi.datatype = "ufloat";
 		hi.placeholder = "5.0";
 		hi.write = write_float;
 
-		hv = i.taboption("timing", form.Value, "HelloValidityTime", _("Hello validity time"));
+		var 	hv = i.taboption("timing", form.Value, "HelloValidityTime", _("Hello validity time"));
 		hv.optional = true;
 		hv.datatype = "ufloat";
 		hv.placeholder = "40.0";
 		hv.write = write_float;
 
-		ti = i.taboption("timing", form.Value, "TcInterval", _("TC interval"));
+		var 	ti = i.taboption("timing", form.Value, "TcInterval", _("TC interval"));
 		ti.optional = true;
 		ti.datatype = "ufloat";
 		ti.placeholder = "2.0";
 		ti.write = write_float;
 
-		tv = i.taboption("timing", form.Value, "TcValidityTime", _("TC validity time"));
+		var 	tv = i.taboption("timing", form.Value, "TcValidityTime", _("TC validity time"));
 		tv.optional = true;
 		tv.datatype = "ufloat";
 		tv.placeholder = "256.0";
 		tv.write = write_float;
 
-		mi = i.taboption("timing", form.Value, "MidInterval", _("MID interval"));
+		var 	mi = i.taboption("timing", form.Value, "MidInterval", _("MID interval"));
 		mi.optional = true;
 		mi.datatype = "ufloat";
 		mi.placeholder = "18.0";
 		mi.write = write_float;
 
-		mv = i.taboption("timing", form.Value, "MidValidityTime", _("MID validity time"));
+		var 	mv = i.taboption("timing", form.Value, "MidValidityTime", _("MID validity time"));
 		mv.optional = true;
 		mv.datatype = "ufloat";
 		mv.placeholder = "324.0";
 		mv.write = write_float;
 
-		ai = i.taboption("timing", form.Value, "HnaInterval", _("HNA interval"));
+		var 	ai = i.taboption("timing", form.Value, "HnaInterval", _("HNA interval"));
 		ai.optional = true;
 		ai.datatype = "ufloat";
 		ai.placeholder = "18.0";
 		ai.write = write_float;
 
-		av = i.taboption("timing", form.Value, "HnaValidityTime", _("HNA validity time"));
+		var 	av = i.taboption("timing", form.Value, "HnaValidityTime", _("HNA validity time"));
 		av.optional = true;
 		av.datatype = "ufloat";
 		av.placeholder = "108.0";
