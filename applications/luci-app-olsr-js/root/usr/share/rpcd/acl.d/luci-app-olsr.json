@@ -9,16 +9,9 @@
 				"luci-rpc": [
 					"*"
 				],
-				"system": [
-					"info",
-					"board"
-				],
 				"olsrinfo": [
 					"getjsondata",
 					"hasipip"
-				],
-				"luci": [
-					"setInitAction"
 				]
 			},
 			"file": {
