@@ -1,12 +1,12 @@
 {
-	"freifunk/olsr": {
+	"olsr": {
 			"title": "OLSR",
 			"order": 5,
 			"action": {
 					"type": "firstchild"
 			}
 	},
-	"freifunk/olsr/neighbours": {
+	"olsr/neighbours": {
 			"title": "Neighbours",
 			"order": 15,
 			"action": {
@@ -14,7 +14,7 @@
 					"path": "olsr/status-olsr/neighbours"
 			}
 	},
-	"freifunk/olsr/routes": {
+	"olsr/routes": {
 			"title": "Routes",
 			"order": 20,
 			"action": {
@@ -22,7 +22,7 @@
 					"path": "olsr/status-olsr/routes"
 			}
 	},
-	"freifunk/olsr/topology": {
+	"olsr/topology": {
 		"title": "Topology",
 		"order": 25,
 		"action": {
@@ -30,7 +30,7 @@
 				"path": "olsr/status-olsr/topology"
 		}
 	},
-	"freifunk/olsr/hna": {
+	"olsr/hna": {
 		"title": "HNA",
 		"order": 30,
 		"action": {
@@ -38,7 +38,7 @@
 				"path": "olsr/status-olsr/hna"
 		}
 	},
-	"freifunk/olsr/mid": {
+	"olsr/mid": {
 		"title": "MID",
 		"order": 35,
 		"action": {
@@ -46,7 +46,7 @@
 				"path": "olsr/status-olsr/mid"
 		}
 	},
-	"freifunk/olsr/smartgw": {
+	"olsr/smartgw": {
 		"title": "SmartGW",
 		"order": 40,
 		"action": {
