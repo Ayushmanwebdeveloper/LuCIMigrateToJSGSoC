@@ -1,6 +1,7 @@
-"use strict";
-"require view";
-
+'use strict';
+'require view';
+'require rpc';
+'require ui';
 return view.extend({
 	render: function () {
 		return E('div', {}, [

@@ -2,6 +2,8 @@
 'require uci';
 'require view';
 'require poll';
+'require rpc';
+'require ui';
 
 return view.extend({
 

@@ -3,6 +3,8 @@
 'require view';
 'require poll';
 'require network';
+'require rpc';
+'require ui';
 
 function etx_color(etx) {
 	let color = "#bb3333";

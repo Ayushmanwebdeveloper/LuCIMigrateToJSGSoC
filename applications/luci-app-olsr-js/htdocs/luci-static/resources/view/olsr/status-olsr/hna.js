@@ -1,8 +1,10 @@
 'use strict';
 'require uci';
 'require view';
-'require poll'
+'require poll';
 'require network';
+'require rpc';
+'require ui';
 
 
 return view.extend({

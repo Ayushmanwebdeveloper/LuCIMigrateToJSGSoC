@@ -1,6 +1,8 @@
 'use strict';
 'require uci';
 'require view';
+'require rpc';
+'require ui';
 
 return view.extend({
 

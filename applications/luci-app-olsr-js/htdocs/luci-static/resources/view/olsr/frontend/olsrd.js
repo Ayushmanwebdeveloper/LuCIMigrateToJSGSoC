@@ -1,8 +1,10 @@
-"use	strict";
-"require	view";
-"require	form";
-"require	fs";
-"require	uci";
+'use	strict';
+'require	view';
+'require	form';
+'require	fs';
+'require	uci';
+'require ui';
+'require rpc';
 
 
 return view.extend({
