@@ -152,13 +152,13 @@ return view.extend({
       });
   });
 },
-    load: () => {
+    load: function() {
         return Promise.all([
             uci.load('olsrd'),
             uci.load('system')    
         ])
     },
-    render: () => {
+    render: function() {
 					
 							var rv = [];
 							for (var k = 0; k < links.length; k++) {

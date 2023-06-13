@@ -22,7 +22,6 @@
 				]
 			},
 			"uci": [
-				"get",
 				"luci_olsr",
 				"olsrd",
 				"olsrd6"

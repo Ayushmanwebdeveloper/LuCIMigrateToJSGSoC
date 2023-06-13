@@ -132,13 +132,13 @@ return view.extend({
 },
 	
 
- load: () => {
+ load: function () {
         return Promise.all([
             uci.load('olsrd'),
             uci.load('system')    
         ])
     },
-    render: () => {
+    render: function () {
 					var hna_res;
 					var has_v4;
 					var has_v6;
