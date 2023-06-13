@@ -3,9 +3,6 @@
 		"description": "Grant UCI access for luci-app-olsr",
 		"read": {
 			"ubus": {
-				"uci": [
-					"get"
-				],
 				"luci-rpc": [
 					"*"
 				],
@@ -25,6 +22,7 @@
 				]
 			},
 			"uci": [
+				"get",
 				"luci_olsr",
 				"olsrd",
 				"olsrd6"
