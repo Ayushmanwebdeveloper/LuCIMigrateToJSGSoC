@@ -37,9 +37,7 @@ return view.extend({
 		return new Promise(function(resolve, reject) {
 				L.resolveDefault(self.callGetJsonStatus(otable, v4_port, v6_port), {})
 						.then(function(res) {
-								try {
-										json = JSON.parse(res);
-								} catch (err) {console.log(err)}
+							json = res;
 	
 								jsonreq4 = json.jsonreq4;
 								jsonreq6 = json.jsonreq6;
