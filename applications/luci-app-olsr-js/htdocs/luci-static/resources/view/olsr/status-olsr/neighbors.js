@@ -53,8 +53,8 @@ return view.extend({
 						.then(function(res) {
 							json = res;
 	
-								jsonreq4 = json.jsonreq4;
-								jsonreq6 = json.jsonreq6;
+								jsonreq4 = JSON.parse(json.jsonreq4);
+								jsonreq6 = JSON.parse(json.jsonreq6);
 								var jsondata4 = {};
 								var jsondata6 = {};
 								var data4 = [];

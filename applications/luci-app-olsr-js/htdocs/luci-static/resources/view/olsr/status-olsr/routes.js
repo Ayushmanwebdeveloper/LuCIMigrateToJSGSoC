@@ -40,8 +40,8 @@ return view.extend({
 						.then(function(res) {
 							json = res;
 	
-								jsonreq4 = json.jsonreq4;
-								jsonreq6 = json.jsonreq6;
+								jsonreq4 = JSON.parse(json.jsonreq4);
+								jsonreq6 = JSON.parse(json.jsonreq6);
 								var jsondata4 = {};
 								var jsondata6 = {};
 								var data4 = [];
@@ -113,9 +113,9 @@ return view.extend({
             return a.proto < b.proto;
           }
         }
-
+								var modifiedData;
 								network.getHostHints().then(function(hosthints) {
-									var modifiedData = data.map(function(v) {
+									modifiedData = data.map(function(v) {
 											if (resolveVal === "1") {
 													var hostname = hosthints.getHostnameByIPAddr(v.gateway);
 													if (hostname) {
@@ -124,16 +124,17 @@ return view.extend({
 											}
 											return v;
 									});
-							}).catch(function(err) {
-									var modifiedData = data;
-									console.error(err);
-							});
+							
 							
 
 							modifiedData.sort(compare);
 
         var result = { routes: modifiedData, has_v4: has_v4, has_v6: has_v6 };
         resolve(result);
+							}).catch(function(err) {
+								modifiedData = data;
+								console.error(err);
+						});
       })
       .catch(function(err) {
         reject(err);
