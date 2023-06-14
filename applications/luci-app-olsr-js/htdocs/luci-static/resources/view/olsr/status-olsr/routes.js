@@ -41,7 +41,7 @@ return view.extend({
 							json = res;
 	
 								jsonreq4 = JSON.parse(json.jsonreq4);
-								jsonreq6 = JSON.parse(json.jsonreq6);
+								jsonreq6 = json.jsonreq6 !== "" ? JSON.parse(json.jsonreq6) : [];
 								var jsondata4 = {};
 								var jsondata6 = {};
 								var data4 = [];
