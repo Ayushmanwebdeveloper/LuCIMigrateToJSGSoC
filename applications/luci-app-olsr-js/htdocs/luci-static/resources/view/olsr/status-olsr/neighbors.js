@@ -47,13 +47,13 @@ return view.extend({
 		var v4_port = parseInt(uci.get("olsrd", "olsrd_jsoninfo", "port") || "") || 9090;
 		var v6_port = parseInt(uci.get("olsrd6", "olsrd_jsoninfo", "port") || "") || 9090;
 		var json;
-	
+	 var self = this;
 		return new Promise(function(resolve, reject) {
-				L.resolveDefault(this.callGetJsonStatus(otable, v4_port, v6_port), {})
+				L.resolveDefault(self.callGetJsonStatus(otable, v4_port, v6_port), {})
 						.then(function(res) {
 								try {
 										json = JSON.parse(res);
-								} catch (err) {}
+								} catch (err) {console.log(err)}
 	
 								jsonreq4 = json.jsonreq4;
 								jsonreq6 = json.jsonreq6;
@@ -111,8 +111,9 @@ return view.extend({
 		});
 	},
 	action_hna: function() {
+		var self = this;
   return new Promise(function(resolve, reject) {
-    this.fetch_jsoninfo('hna')
+    self.fetch_jsoninfo('hna')
       .then(function([data, has_v4, has_v6, error]) {
         if (error) {
           reject(error);

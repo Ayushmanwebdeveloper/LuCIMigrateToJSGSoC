@@ -1,0 +1,27 @@
+{
+	"unauthenticated": {
+					"description": "Grant read access",
+					"read": {
+									"ubus": {
+													"uci": [
+																	"get"
+													],
+													"luci-rpc": [
+																	"*"
+													],
+													"olsrinfo": [
+														"getjsondata",
+														"hasipip"
+													],
+													"file": [
+																	"read"
+													]
+									},
+									"uci": [
+										"luci_olsr",
+										"olsrd",
+										"olsrd6"
+									]
+					}
+	}
+}
