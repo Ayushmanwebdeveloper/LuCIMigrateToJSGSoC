@@ -163,8 +163,7 @@ return view.extend({
 									E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
 									E('div', { 'class': 'th cbi-section-table-cell' }, _('Metric')),
 									E('div', { 'class': 'th cbi-section-table-cell' }, 'ETX')
-							]),
-							tableRows
+							])
 					]);
 						var rv = [];
 						for (var k = 0; k < routes_res.length; k++) {

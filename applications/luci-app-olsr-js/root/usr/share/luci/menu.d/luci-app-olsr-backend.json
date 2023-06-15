@@ -11,7 +11,8 @@
 		}
 	},
 	"admin/services/olsrd/iface": {
-		"order": 5,
+		"title": "Interfaces",
+		"order": 10,
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrdiface"
@@ -19,7 +20,7 @@
 	},
 	"admin/services/olsrd/hna": {
 		"title": "HNA Announcements",
-		"order": 5,
+		"order": 15,
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrdhna"
@@ -27,7 +28,7 @@
 	},
 	"admin/services/olsrd/plugins": {
 		"title": "Plugins",
-		"order": 5,
+		"order": 20,
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrdplugins"
@@ -35,7 +36,7 @@
 	},
 	"admin/services/olsrd6": {
 		"title": "OLSR IPv6",
-		"order": 10,
+		"order": 5,
 		"depends": {
 			"acl" : ["luci-app-olsr"]
   },
@@ -45,7 +46,7 @@
 		}
 	},
 	"admin/services/olsrd6/iface": {
-		"order": 5,
+		"order": 10,
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrdiface6"
@@ -53,7 +54,7 @@
 	},
 	"admin/services/olsrd6/hna": {
 		"title": "HNA Announcements",
-		"order": 5,
+		"order": 15,
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrdhna6"
@@ -61,7 +62,7 @@
 	},
 	"admin/services/olsrd6/plugins": {
 		"title": "Plugins",
-		"order": 5,
+		"order": 20,
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrdplugins6"
