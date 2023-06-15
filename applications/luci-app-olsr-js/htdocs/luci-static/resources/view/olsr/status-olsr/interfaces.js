@@ -129,11 +129,22 @@ return view.extend({
 					var has_v4;
 					var has_v6;
 
-					this.action_interfaces().then(function(result) {
+		return	this.action_interfaces().then(function(result) {
 						iface_res = result.iface;
 						has_v4 = result.has_v4;
 						has_v6 = result.has_v6;
-						var tableRows = [];
+						var table = E('div', { 'class': 'table cbi-section-table' }, [
+							E('div', { 'class': 'tr' }, [
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Device')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('State')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('MTU')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('WLAN')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Source address')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Netmask')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Broadcast address'))
+							])
+					]);
 						var i = 1;
 						
 						for (var k = 0; k < iface_res.length; k++) {
@@ -150,23 +161,11 @@ return view.extend({
 										E('div', { 'class': 'td cbi-section-table-cell left' }, iface.olsrInterface.ipv4Address !== '0.0.0.0' ? iface.olsrInterface.ipv4Broadcast : iface.olsrInterface.ipv6Multicast)
 								]);
 						
-								tableRows.push(tr);
+								table.appendChild(tr);
 								i = (i % 2) + 1;
 						}
 						
-						var table = E('div', { 'class': 'table cbi-section-table' }, [
-								E('div', { 'class': 'tr' }, [
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Device')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('State')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('MTU')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('WLAN')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Source address')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Netmask')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Broadcast address'))
-								]),
-								tableRows
-						]);
+
 						
 						var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
 								E('legend', {}, _('Overview of interfaces where OLSR is running')),

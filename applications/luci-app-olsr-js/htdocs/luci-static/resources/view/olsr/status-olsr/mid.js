@@ -113,11 +113,18 @@ return view.extend({
 					var has_v4;
 					var has_v6;
 
-					this.action_mid().then(function(result) {
+					return this.action_mid().then(function(result) {
 						mids_res = result.mids;
 						has_v4 = result.has_v4;
 						has_v6 = result.has_v6;
-						var tableRows = [];
+
+						var table = E('div', { 'class': 'table cbi-section-table' }, [
+							E('div', { 'class': 'tr cbi-section-table-titles' }, [
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR node')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Secondary OLSR interfaces'))
+							])
+					]);
+					
 					 var i = 1;
 					
 					for (var k = 0; k < mids_res.length; k++) {
@@ -141,17 +148,11 @@ return view.extend({
 									E('div', { 'class': 'td cbi-section-table-cell left' }, aliases)
 							]);
 					
-							tableRows.push(tr);
+							table.appendChild(tr);
 							i = (i % 2) + 1;
 					}
 					
-					var table = E('div', { 'class': 'table cbi-section-table' }, [
-							E('div', { 'class': 'tr cbi-section-table-titles' }, [
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR node')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('Secondary OLSR interfaces'))
-							]),
-							tableRows
-					]);
+				
 					
 					var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
 							E('legend', {}, _('Overview of known multiple interface announcements')),

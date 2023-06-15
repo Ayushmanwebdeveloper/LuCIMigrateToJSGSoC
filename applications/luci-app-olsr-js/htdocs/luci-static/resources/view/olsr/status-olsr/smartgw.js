@@ -120,10 +120,26 @@ return view.extend({
 					var has_v4;
 					var has_v6;
 
-					this.action_smartgw().then(function(result) {
+					return	this.action_smartgw().then(function(result) {
 						gws_res = result.gws;
 						has_v4 = result.has_v4;
 						has_v6 = result.has_v6;
+						var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
+							E('legend', {}, _('Overview of smart gateways in this network')),
+							E('div', { 'class': 'table cbi-section-table', 'id': 'olsrd_smartgw' }, [
+									E('div', { 'class': 'tr cbi-section-table-titles' }, [
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('Gateway')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('Selected')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('ETX')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('Hops')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('Uplink')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('Downlink')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('IPv4')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('IPv6')),
+											E('div', { 'class': 'th cbi-section-table-cell' }, _('Prefix'))
+									])
+							])
+					]);
 						var has_smartgw;
 						uci.sections("olsrd", "olsrd", function(s) {
 							if (s.SmartGateway && s.SmartGateway === "yes") {
@@ -202,7 +218,7 @@ return view.extend({
 				
 	
 	
-						var tableRows = [];
+						
 						var i = 1;
 						
 						if (has_smartgw) {
@@ -233,27 +249,11 @@ return view.extend({
 												E('div', { 'class': 'td cbi-section-table-cell left' }, gw.prefix)
 										]);
 						
-										tableRows.push(tr);
+										fieldset.appendChild(tr);
 										i = (i % 2) + 1;
 								}
 						
-								var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
-										E('legend', {}, _('Overview of smart gateways in this network')),
-										E('div', { 'class': 'table cbi-section-table', 'id': 'olsrd_smartgw' }, [
-												E('div', { 'class': 'tr cbi-section-table-titles' }, [
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('Gateway')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('Selected')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('ETX')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('Hops')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('Uplink')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('Downlink')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('IPv4')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('IPv6')),
-														E('div', { 'class': 'th cbi-section-table-cell' }, _('Prefix'))
-												]),
-												tableRows
-										])
-								]);
+								
 						
 								var h2 = E('h2', { 'name': 'content' }, _('SmartGW announcements'));
 								var divToggleButtons = E('div', { 'id': 'togglebuttons' });

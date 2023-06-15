@@ -132,11 +132,19 @@ return view.extend({
 					var has_v4;
 					var has_v6;
 
-					this.action_topology().then(function(result) {
+					return	this.action_topology().then(function(result) {
 						routes_res = result.routes;
 						has_v4 = result.has_v4;
 						has_v6 = result.has_v6;
-						var tableRows = [];
+						var table = E('div', { 'class': 'table cbi-section-table' }, [
+							E('div', { 'class': 'tr cbi-section-table-titles' }, [
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR node')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Last hop')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('LQ')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('NLQ')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('ETX'))
+							])
+					]);
 					var i = 1;
 					
 					for (var k = 0; k < routes_res.length; k++) {
@@ -162,20 +170,11 @@ return view.extend({
 									E('div', { 'class': 'td cbi-section-table-cell left', 'style': 'background-color:' + color }, cost)
 							]);
 					
-							tableRows.push(tr);
+							table.appendChild(tr);
 							i = (i % 2) + 1;
 					}
 					
-					var table = E('div', { 'class': 'table cbi-section-table' }, [
-							E('div', { 'class': 'tr cbi-section-table-titles' }, [
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR node')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('Last hop')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('LQ')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('NLQ')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('ETX'))
-							]),
-							tableRows
-					]);
+					
 					
 					var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
 							E('legend', {}, _('Overview of currently known OLSR nodes')),

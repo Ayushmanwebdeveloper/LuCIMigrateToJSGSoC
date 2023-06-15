@@ -9,6 +9,18 @@
 													"luci-rpc": [
 																	"*"
 													],
+													"network.interface": [
+														"dump"
+													],
+													"network": [
+														"get_proto_handlers"
+													],
+													"olsrd": [
+														"olsrd_jsoninfo"
+													],
+													"olsrd6": [
+														"olsrd_jsoninfo"
+													],
 													"olsrinfo": [
 														"getjsondata",
 														"hasipip"
@@ -20,7 +32,9 @@
 									"uci": [
 										"luci_olsr",
 										"olsrd",
-										"olsrd6"
+										"olsrd6",
+										"network",
+										"network.interface"
 									]
 					}
 	}

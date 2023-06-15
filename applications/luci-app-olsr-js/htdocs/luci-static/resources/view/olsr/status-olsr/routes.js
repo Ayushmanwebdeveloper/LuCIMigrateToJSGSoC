@@ -152,10 +152,20 @@ return view.extend({
 					var has_v4;
 					var has_v6;
 
-					this.action_routes().then(function(result) {
+					return	this.action_routes().then(function(result) {
 						routes_res = result.routes;
 						has_v4 = result.has_v4;
 						has_v6 = result.has_v6;
+						var table = E('div', { 'class': 'table cbi-section-table', 'id': 'olsrd_routes' }, [
+							E('div', { 'class': 'tr cbi-section-table-cell' }, [
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Announced network')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR gateway')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Metric')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, 'ETX')
+							]),
+							tableRows
+					]);
 						var rv = [];
 						for (var k = 0; k < routes_res.length; k++) {
 										var route = routes_res[k];
@@ -214,7 +224,7 @@ return view.extend({
 				
 	
 	
-						var tableRows = [];
+					
 						var i = 1;
 						
 						for (var k = 0; k < routes_res.length; k++) {
@@ -238,20 +248,11 @@ return view.extend({
 										])
 								]);
 						
-								tableRows.push(tr);
+								table.appendChild(tr);
 								i = (i % 2) + 1;
 						}
 						
-						var table = E('div', { 'class': 'table cbi-section-table', 'id': 'olsrd_routes' }, [
-								E('div', { 'class': 'tr cbi-section-table-cell' }, [
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Announced network')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR gateway')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, _('Metric')),
-										E('div', { 'class': 'th cbi-section-table-cell' }, 'ETX')
-								]),
-								tableRows
-						]);
+						
 						
 						var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
 								E('legend', {}, _('Overview of currently known routes to other OLSR nodes')),

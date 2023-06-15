@@ -146,10 +146,17 @@ return view.extend({
 					var has_v4;
 					var has_v6;
 
-					this.action_hna().then(function(result) {
+					return	this.action_hna().then(function(result) {
 						hna_res = result.hna;
 						has_v4 = result.has_v4;
 						has_v6 = result.has_v6;
+						var table = E('div', { 'class': 'table cbi-section-table', 'id': 'olsrd_hna' }, [
+							E('div', { 'class': 'tr cbi-section-table-titles' }, [
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Announced network')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR gateway')),
+									E('div', { 'class': 'th cbi-section-table-cell' }, _('Validity Time'))
+							])
+					]);
 
 					var i = 1;
 
@@ -204,7 +211,7 @@ return view.extend({
 						
 					}, 10);
 				
-					var tableRows = [];
+				
 					var i = 1;
 					
 					for (var k = 0; k < hna_res.length; k++) {
@@ -219,18 +226,11 @@ return view.extend({
 									E('div', { 'class': 'td cbi-section-table-cell left' }, route.validityTime ? route.validityTime + 's' : '-')
 							]);
 					
-							tableRows.push(tr);
+							table.appendChild(tr);
 							i = (i % 2) + 1;
 					}
 					
-					var table = E('div', { 'class': 'table cbi-section-table', 'id': 'olsrd_hna' }, [
-							E('div', { 'class': 'tr cbi-section-table-titles' }, [
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('Announced network')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('OLSR gateway')),
-									E('div', { 'class': 'th cbi-section-table-cell' }, _('Validity Time'))
-							]),
-							tableRows
-					]);
+					
 					
 					var fieldset = E('fieldset', { 'class': 'cbi-section' }, [
 							E('legend', {}, _('Overview of currently active OLSR host net announcements')),
