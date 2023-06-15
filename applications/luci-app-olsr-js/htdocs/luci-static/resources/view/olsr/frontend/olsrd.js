@@ -326,34 +326,34 @@ return view.extend({
 
 		var 	mode = ifs.option(form.DummyValue, "Mode", _("Mode"));
 		mode.cfgvalue = function (section_id) {
-			return uci.get("olsrd", section_id, "Mode");
+			return uci.get("olsrd", section_id, "Mode") || uci.get_first("olsrd", "InterfaceDefaults", "Mode");
 		};
 
 		var 	hello = ifs.option(form.DummyValue, "_hello", _("Hello"));
 		hello.cfgvalue = function (section_id) {
-			var i = uci.get("olsrd", section_id, "HelloInterval");
-			var v = uci.get("olsrd", section_id, "HelloValidityTime");
+			var i = uci.get("olsrd", section_id, "HelloInterval")||uci.get_first("olsrd", "InterfaceDefaults", "HelloInterval");
+			var v = uci.get("olsrd", section_id, "HelloValidityTime")||uci.get_first("olsrd", "InterfaceDefaults", "HelloValidityTime");
 			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
 		};
 
 		var 	tc = ifs.option(form.DummyValue, "_tc", _("TC"));
 		tc.cfgvalue = function (section_id) {
-			var i = uci.get("olsrd", section_id, "TcInterval");
-			var v = uci.get("olsrd", section_id, "TcValidityTime");
+			var i = uci.get("olsrd", section_id, "TcInterval")||uci.get_first("olsrd", "InterfaceDefaults", "TcInterval");
+			var v = uci.get("olsrd", section_id, "TcValidityTime")||uci.get_first("olsrd", "InterfaceDefaults", "TcValidityTime");
 			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
 		};
 
 		var 	mid = ifs.option(form.DummyValue, "_mid", _("MID"));
 		mid.cfgvalue = function (section_id) {
-			var i = uci.get("olsrd", section_id, "MidInterval");
-			var v = uci.get("olsrd", section_id, "MidValidityTime");
+			var i = uci.get("olsrd", section_id, "MidInterval")||uci.get_first("olsrd", "InterfaceDefaults", "MidInterval");
+			var v = uci.get("olsrd", section_id, "MidValidityTime")||uci.get_first("olsrd", "InterfaceDefaults", "MidValidityTime");
 			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
 		};
 
 		var 	hna = ifs.option(form.DummyValue, "_hna", _("HNA"));
 		hna.cfgvalue = function (section_id) {
-			var i = uci.get("olsrd", section_id, "HnaInterval");
-			var v = uci.get("olsrd", section_id, "HnaValidityTime");
+			var i = uci.get("olsrd", section_id, "HnaInterval")||uci.get_first("olsrd", "InterfaceDefaults", "HnaInterval");
+			var v = uci.get("olsrd", section_id, "HnaValidityTime")||uci.get_first("olsrd", "InterfaceDefaults", "HnaValidityTime");
 			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
 		};
 
