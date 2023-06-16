@@ -45,7 +45,7 @@ return view.extend({
 		function write_float(section, value) {
 			let n = parseFloat(value);
 			if (!isNaN(n)) {
-				uci.set("olsrd6", section, "name", n.toFixed(1));
+				uci.set("olsrd6", section, "name", n);
 			}
 		}
 
@@ -207,7 +207,7 @@ return view.extend({
 		lqmult.cast = "table";
 		lqmult.placeholder = "default 1.0";
 
-		lqmult.validate = function (value) {
+		lqmult.validate = function (section_id, value) {
 			for (var i = 0; i < value.length; i++) {
 				var v = value[i];
 				if (v !== "") {
@@ -290,7 +290,7 @@ return view.extend({
 		av.placeholder = "108.0";
 		av.write = write_float;
 
-		var ifs = m.section(form.TypedSection, "Interface", _("Interfaces"));
+		var ifs = m.section(form.TableSection, "Interface", _("Interfaces"));
 		ifs.addremove = true;
 		ifs.anonymous = true;
 		ifs.extedit = "admin/services/olsrd6/iface";
@@ -321,28 +321,28 @@ return view.extend({
 		hello.cfgvalue = function (section_id) {
 			var i = uci.get("olsrd6", section_id, "HelloInterval")||uci.get_first("olsrd6", "InterfaceDefaults", "HelloInterval");
 			var v = uci.get("olsrd6", section_id, "HelloValidityTime")||uci.get_first("olsrd6", "InterfaceDefaults", "HelloValidityTime");
-			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
+			return `${i}s / ${v}s`;
 		};
 
 		var 	tc = ifs.option(form.DummyValue, "_tc", _("TC"));
 		tc.cfgvalue = function (section_id) {
 			var i = uci.get("olsrd6", section_id, "TcInterval")||uci.get_first("olsrd6", "InterfaceDefaults", "TcInterval");
 			var v = uci.get("olsrd6", section_id, "TcValidityTime")||uci.get_first("olsrd6", "InterfaceDefaults", "TcValidityTime");
-			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
+			return `${i}s / ${v}s`;
 		};
 
 		var 	mid = ifs.option(form.DummyValue, "_mid", _("MID"));
 		mid.cfgvalue = function (section_id) {
 			var i = uci.get("olsrd6", section_id, "MidInterval")||uci.get_first("olsrd6", "InterfaceDefaults", "MidInterval");
 			var v = uci.get("olsrd6", section_id, "MidValidityTime")||uci.get_first("olsrd6", "InterfaceDefaults", "MidValidityTime");
-			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
+			return `${i}s / ${v}s`;
 		};
 
 		var 	hna = ifs.option(form.DummyValue, "_hna", _("HNA"));
 		hna.cfgvalue = function (section_id) {
 			var i = uci.get("olsrd6", section_id, "HnaInterval")||uci.get_first("olsrd6", "InterfaceDefaults", "HnaInterval");
 			var v = uci.get("olsrd6", section_id, "HnaValidityTime")||uci.get_first("olsrd6", "InterfaceDefaults", "HnaValidityTime");
-			return `${i.toFixed(1)}s / ${v.toFixed(1)}s`;
+			return `${i}s / ${v}s`;
 		};
 
 		return m.render();
