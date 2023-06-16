@@ -232,7 +232,7 @@ return view.extend({
 					}
 				}
 			}
-			return [value];
+			return true;
 		};
 		var 	ip4b = i.taboption("addrs", form.Value, "Ip4Broadcast", _("IPv4 broadcast"), _("IPv4 broadcast address for outgoing OLSR packets. One useful example would be 255.255.255.255. " + 'Default is "0.0.0.0", which triggers the usage of the interface broadcast IP.'));
 		ip4b.optional = true;

@@ -228,7 +228,7 @@ return view.extend({
 					}
 				}
 			}
-			return [value];
+			return true;
 		};
 		
 		var   ip6m = i.taboption("addrs", form.Value, "IPv6Multicast", _("IPv6 multicast"), _('IPv6 multicast address. Default is "FF02::6D", the manet-router linklocal multicast.'));
