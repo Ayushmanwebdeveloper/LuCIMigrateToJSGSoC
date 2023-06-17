@@ -293,13 +293,15 @@ return view.extend({
 		var ifs = m.section(form.TableSection, "Interface", _("Interfaces"));
 		ifs.addremove = true;
 		ifs.anonymous = true;
-		ifs.extedit = "admin/services/olsrd6/iface";
+		ifs.extedit = function(section_id) {
+			window.location.href = `iface/${section_id}`;
+		};
 		ifs.template = "cbi/tblsection";
 
 		ifs.handleAdd = function(ev) {
 			var sid = uci.add("olsrd6", "Interface");
 			uci.save();
-			window.location.href = `${ifs.extedit}/${sid}`;
+			window.location.href = `iface/${sid}`;
 		};
 		var ign = ifs.option(form.Flag, "ignore", _("Enable"));
 		ign.enabled = "0";

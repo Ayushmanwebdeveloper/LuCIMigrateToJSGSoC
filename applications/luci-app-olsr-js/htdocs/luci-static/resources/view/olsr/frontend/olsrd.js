@@ -302,15 +302,17 @@ return view.extend({
 		av.placeholder = "108.0";
 		av.write = write_float;
 
-		var 		ifs = m.section(form.TableSection, "Interface", _("Interfaces"));
+		var ifs = m.section(form.TableSection, "Interface", _("Interfaces"));
 		ifs.addremove = true;
 		ifs.anonymous = true;
-		ifs.extedit = "admin/services/olsrd/iface";
+		ifs.extedit = function(section_id) {
+			window.location.href = `iface/${section_id}`;
+		};
 		ifs.template = "cbi/tblsection";
 		ifs.handleAdd = function(ev) {
 			var sid = uci.add("olsrd", "Interface");
 			uci.save();
-			window.location.href = `${ifs.extedit}/${sid}`;
+			window.location.href = `iface/${sid}`;
 		};
 
 		var 	ign = ifs.option(form.Flag, "ignore", _("Enable"));

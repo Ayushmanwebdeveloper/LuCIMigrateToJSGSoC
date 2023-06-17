@@ -41,7 +41,7 @@ return view.extend({
 		ign.rmempty = false;
 
 		ign.cfgvalue = function (section_id) {
-			return Flag.cfgvalue(section_id) || "0";
+			return uci.get("olsrd", section_id, "ignore") || "0";
 		};
 
 		var 	network = i.taboption("general", form.Value, "interface", _("Network"), _("The interface OLSRd should serve."));
@@ -67,28 +67,28 @@ return view.extend({
 		lqmult.cast = "table";
 		lqmult.placeholder = "default 1.0";
 
-		lqmult.validate = function (value) {
-			for (let i = 0; i < value.length; i++) {
-				const v = value[i];
+		lqmult.validate = function (section_id ) {
+			for (var i = 0; i < lqmult.formvalue(section_id).length; i++) {
+				var v = lqmult.formvalue(section_id)[i];
 				if (v !== "") {
-					const val = v.split(" ");
-					const host = val[0];
-					const mult = val[1];
+					var val = v.split(" ");
+					var host = val[0];
+					var mult = val[1];
 					if (!host || !mult) {
-						return [null, _("LQMult requires two values (IP address or 'default' and multiplicator) separated by space.")];
+						return [null, "LQMult requires two values (IP address or 'default' and multiplicator) separated by space."];
 					}
-					if (!(host === "default" || !/^(\d{1,3}\.){3}\d{1,3}$|^([a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/.test(host))) {
-						return [null, _("Can only be a valid IPv4 or IPv6 address or 'default'")];
+					if (!/^(\d{1,3}\.){3}\d{1,3}$|^([a-fA-F0-9]{1,4}:){7}[a-fA-F0-9]{1,4}$/.test(host) && host !== "default") {
+						return [null, "Can only be a valid IPv4 or IPv6 address or 'default'"];
 					}
-					if (!parseFloat(mult) || parseFloat(mult) > 1 || parseFloat(mult) < 0.01) {
-						return [null, _("Invalid Value for LQMult-Value. Must be between 0.01 and 1.0.")];
+					if (isNaN(mult) || mult > 1 || mult < 0.01) {
+						return [null, "Invalid Value for LQMult-Value. Must be between 0.01 and 1.0."];
 					}
-					if (!mult.match(/[0-1]\.[0-9]+/)) {
-						return [null, _("Invalid Value for LQMult-Value. You must use a decimal number between 0.01 and 1.0 here.")];
+					if (!/^[0-1]\.\d+$/.test(mult)) {
+						return [null, "Invalid Value for LQMult-Value. You must use a decimal number between 0.01 and 1.0 here."];
 					}
 				}
 			}
-			return [value];
+			return true;
 		};
 
 		var 	ip4b = i.taboption("addrs", form.Value, "Ip4Broadcast", _("IPv4 broadcast"), _("IPv4 broadcast address for outgoing OLSR packets. One useful example would be 255.255.255.255. " + 'Default is "0.0.0.0", which triggers the usage of the interface broadcast IP.'));
