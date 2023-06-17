@@ -17,12 +17,17 @@ return view.extend({
 
 		m.redirect = "admin/services/olsrd"; 
 
-		// if (!process.argv[2] || uci.get("olsrd","main", process.argv[2])!== "Interface") {
-		// 	window.location.href = m.redirect;
-		// 	return;
-		// }
 
-		var 	i = m.section(form.NamedSection, arg[1], "Interface", _("Interface"));
+		var pathname = window.location.pathname;
+		var segments = pathname.split('/');
+		var sidIndex = segments.lastIndexOf('iface') + 1;
+		var sid = null;
+		if (sidIndex !== -1 && sidIndex < segments.length) {
+				    sid = segments[sidIndex];
+		}
+		
+
+		var 	i = m.section(form.NamedSection, sid, "Interface", _("Interface"));
 		i.anonymous = true;
 		i.addremove = false;
 

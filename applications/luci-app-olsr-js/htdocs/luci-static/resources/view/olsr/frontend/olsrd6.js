@@ -207,7 +207,7 @@ return view.extend({
 		lqmult.cast = "table";
 		lqmult.placeholder = "default 1.0";
 
-		lqmult.validate = function (section_id, value) {
+		lqmult.validate = function (section_id ) {
 			for (var i = 0; i < lqmult.formvalue(section_id).length; i++) {
 				var v = lqmult.formvalue(section_id)[i];
 				if (v !== "") {
@@ -296,7 +296,7 @@ return view.extend({
 		ifs.extedit = "admin/services/olsrd6/iface";
 		ifs.template = "cbi/tblsection";
 
-		ifs.create = function () {
+		ifs.handleAdd = function(ev) {
 			var sid = uci.add("olsrd6", "Interface");
 			uci.save();
 			window.location.href = `${ifs.extedit}/${sid}`;

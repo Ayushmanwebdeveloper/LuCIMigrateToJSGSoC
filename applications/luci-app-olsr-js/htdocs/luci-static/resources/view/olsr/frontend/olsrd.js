@@ -211,7 +211,7 @@ return view.extend({
 		lqmult.cast = "table";
 		lqmult.placeholder = "default 1.0";
 
-		lqmult.validate = function (section_id) {
+		lqmult.validate = function (section_id ) {
 			for (var i = 0; i < lqmult.formvalue(section_id).length; i++) {
 				var v = lqmult.formvalue(section_id)[i];
 				if (v !== "") {
@@ -307,12 +307,12 @@ return view.extend({
 		ifs.anonymous = true;
 		ifs.extedit = "admin/services/olsrd/iface";
 		ifs.template = "cbi/tblsection";
-
-		ifs.create = function () {
+		ifs.handleAdd = function(ev) {
 			var sid = uci.add("olsrd", "Interface");
 			uci.save();
 			window.location.href = `${ifs.extedit}/${sid}`;
 		};
+
 		var 	ign = ifs.option(form.Flag, "ignore", _("Enable"));
 		ign.enabled = "0";
 		ign.disabled = "1";
