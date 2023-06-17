@@ -208,8 +208,8 @@ return view.extend({
 		lqmult.placeholder = "default 1.0";
 
 		lqmult.validate = function (section_id, value) {
-			for (var i = 0; i < value.length; i++) {
-				var v = value[i];
+			for (var i = 0; i < lqmult.formvalue(section_id).length; i++) {
+				var v = lqmult.formvalue(section_id)[i];
 				if (v !== "") {
 					var val = v.split(" ");
 					var host = val[0];
