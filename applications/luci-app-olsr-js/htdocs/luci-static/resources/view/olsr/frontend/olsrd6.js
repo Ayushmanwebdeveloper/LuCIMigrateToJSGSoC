@@ -19,9 +19,8 @@ return view.extend({
 		var has_ipip;
 		this.callHasIpIp()
 			.then(function (res) {
-				var output = res;
+				var output = res.result;
 				has_ipip = output.trim().length > 0;
-				console.log(has_ipip);
 			})
 			.catch(function (err) {
 				console.error(err);
