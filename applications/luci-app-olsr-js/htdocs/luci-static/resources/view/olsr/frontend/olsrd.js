@@ -305,15 +305,49 @@ return view.extend({
 		var ifs = m.section(form.TableSection, "Interface", _("Interfaces"));
 		ifs.addremove = true;
 		ifs.anonymous = true;
-		ifs.extedit = function(section_id) {
-			window.location.href = `olsrd/iface/${section_id}`;
-		};
+
+	ifs.extedit = function(eve) {
+			var editButton = eve.target;
+			var sid;
+var row = editButton.closest('.cbi-section-table-row');
+
+if (row) {
+sid = row.getAttribute('data-sid');
+console.log(sid);
+}
+window.location.href = `olsrd/iface/${sid}`;
+};
+
 		ifs.template = "cbi/tblsection";
-		ifs.handleAdd = function(ev) {
-			var sid = uci.add("olsrd", "Interface");
-			uci.save();
-			window.location.href = `olsrd/iface/${sid}`;
-		};
+
+		ifs.handleAdd = function (ev) {
+      var sid = uci.add("olsrd", "Interface");
+      uci
+        .save()
+        .then(function () {
+          return uci.changes();
+        })
+        .then(function (res) {
+          console.log(res);
+          var sid = null;
+          if (res.olsrd && Array.isArray(res.olsrd)) {
+            res.olsrd.forEach(function (item) {
+              if (
+                item.length >= 3 &&
+                item[0] === "add" &&
+                item[2] === "Interface"
+              ) {
+                sid = item[1];
+              }
+            });
+          }
+          if (sid) {
+            console.log(sid);
+          }
+          window.location.href = `olsrd/iface/${sid}`;
+        });
+    };
+
 
 		var 	ign = ifs.option(form.Flag, "ignore", _("Enable"));
 		ign.enabled = "0";

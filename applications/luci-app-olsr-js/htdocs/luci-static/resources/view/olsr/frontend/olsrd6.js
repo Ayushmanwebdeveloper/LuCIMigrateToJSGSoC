@@ -293,16 +293,46 @@ return view.extend({
 		var ifs = m.section(form.TableSection, "Interface", _("Interfaces"));
 		ifs.addremove = true;
 		ifs.anonymous = true;
-		ifs.extedit = function(section_id) {
-			window.location.href = `iface/${section_id}`;
-		};
+		ifs.extedit = function(eve) {
+			var editButton = eve.target;
+			var sid;
+var row = editButton.closest('.cbi-section-table-row');
+
+if (row) {
+sid = row.getAttribute('data-sid');
+console.log(sid);
+}
+window.location.href = `olsrd6/iface/${sid}`;
+};
 		ifs.template = "cbi/tblsection";
 
-		ifs.handleAdd = function(ev) {
+		ifs.handleAdd = function (ev) {
 			var sid = uci.add("olsrd6", "Interface");
-			uci.save();
-			window.location.href = `iface/${sid}`;
-		};
+			uci
+					.save()
+					.then(function () {
+							return uci.changes();
+					})
+					.then(function (res) {
+							console.log(res);
+							var sid = null;
+							if (res.olsrd6 && Array.isArray(res.olsrd6)) {
+									res.olsrd6.forEach(function (item) {
+											if (
+													item.length >= 3 &&
+													item[0] === "add" &&
+													item[2] === "Interface"
+											) {
+													sid = item[1];
+											}
+									});
+							}
+							if (sid) {
+									console.log(sid);
+							}
+							window.location.href = `olsrd6/iface/${sid}`;
+					});
+	};
 		var ign = ifs.option(form.Flag, "ignore", _("Enable"));
 		ign.enabled = "0";
 		ign.disabled = "1";
