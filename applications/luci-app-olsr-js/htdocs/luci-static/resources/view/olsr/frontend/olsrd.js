@@ -306,13 +306,13 @@ return view.extend({
 		ifs.addremove = true;
 		ifs.anonymous = true;
 		ifs.extedit = function(section_id) {
-			window.location.href = `iface/${section_id}`;
+			window.location.href = `olsrd/iface/${section_id}`;
 		};
 		ifs.template = "cbi/tblsection";
 		ifs.handleAdd = function(ev) {
 			var sid = uci.add("olsrd", "Interface");
 			uci.save();
-			window.location.href = `iface/${sid}`;
+			window.location.href = `olsrd/iface/${sid}`;
 		};
 
 		var 	ign = ifs.option(form.Flag, "ignore", _("Enable"));
