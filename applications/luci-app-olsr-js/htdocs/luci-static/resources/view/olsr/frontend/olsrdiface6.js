@@ -9,7 +9,7 @@ return view.extend({
 		function write_float(section_id, value) {
 			let n = parseFloat(value);
 			if (!isNaN(n)) {
-				uci.set("olsrd", section_id, "name", n.toFixed(1));
+				uci.set("olsrd6", section_id, "name", n.toFixed(1));
 			}
 		}
 
