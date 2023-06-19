@@ -151,7 +151,7 @@ return view.extend({
 					var routes_res;
 					var has_v4;
 					var has_v6;
-
+     var self=this;
 					return	this.action_routes().then(function(result) {
 						routes_res = result.routes;
 						has_v4 = result.has_v4;
@@ -180,15 +180,14 @@ return view.extend({
 														color: etx_color(parseFloat(ETX))
 										});
 						}
-						poll.add(function(rv)
-						{
+					
 							var rt = document.getElementById('olsrd_routes');
 							if (rt) {
 											var s = '<div class="tr cbi-section-table-cell">' +
-															'<div class="th cbi-section-table-cell"><%:Announced network%></div>' +
-															'<div class="th cbi-section-table-cell"><%:OLSR gateway%></div>' +
-															'<div class="th cbi-section-table-cell"><%:Interface%></div>' +
-															'<div class="th cbi-section-table-cell"><%:Metric%></div>' +
+															'<div class="th cbi-section-table-cell">Announced network</div>' +
+															'<div class="th cbi-section-table-cell">OLSR gateway</div>' +
+															'<div class="th cbi-section-table-cell">Interface</div>' +
+															'<div class="th cbi-section-table-cell">Metric</div>' +
 															'<div class="th cbi-section-table-cell">ETX</div>' +
 															'</div>';
 							
@@ -218,7 +217,7 @@ return view.extend({
 											rt.innerHTML = s;
 							}
 							
-						}, 10);
+						
 					
 				
 	
@@ -343,7 +342,9 @@ return view.extend({
 								statusOlsrLegend,
 								statusOlsrCommonJs
 						]);
-						
+						setTimeout(function() {
+							self.render();
+					}, 5000);
 						return result;
 					}).catch(function(error) {
 					 console.error(error);

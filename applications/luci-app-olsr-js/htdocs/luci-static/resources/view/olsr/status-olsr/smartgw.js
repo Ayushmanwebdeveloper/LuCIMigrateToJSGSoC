@@ -119,7 +119,7 @@ return view.extend({
 					var gws_res;
 					var has_v4;
 					var has_v6;
-
+     var self=this;
 					return	this.action_smartgw().then(function(result) {
 						gws_res = result.gws;
 						has_v4 = result.has_v4;
@@ -170,20 +170,19 @@ return view.extend({
 							}
 							
 					
-						poll.add(function(rv)
-						{
+					
 							var smartgwdiv = document.getElementById('olsrd_smartgw');
 	if (smartgwdiv) {
 					var s = '<div class="tr cbi-section-table-titles">' +
-									'<div class="th cbi-section-table-cell"><%:Gateway%></div>' +
-									'<div class="th cbi-section-table-cell"><%:Selected%></div>' +
-									'<div class="th cbi-section-table-cell"><%:ETX%></div>' +
-									'<div class="th cbi-section-table-cell"><%:Hops%></div>' +
-									'<div class="th cbi-section-table-cell"><%:Uplink%></div>' +
-									'<div class="th cbi-section-table-cell"><%:Downlink%></div>' +
-									'<div class="th cbi-section-table-cell"><%:IPv4%></div>' +
-									'<div class="th cbi-section-table-cell"><%:IPv6%></div>' +
-									'<div class="th cbi-section-table-cell"><%:Prefix%></div>' +
+									'<div class="th cbi-section-table-cell">Gateway</div>' +
+									'<div class="th cbi-section-table-cell">Selected</div>' +
+									'<div class="th cbi-section-table-cell">ETX></div>' +
+									'<div class="th cbi-section-table-cell">Hops></div>' +
+									'<div class="th cbi-section-table-cell">Uplink</div>' +
+									'<div class="th cbi-section-table-cell">Downlink</div>' +
+									'<div class="th cbi-section-table-cell">IPv4</div>' +
+									'<div class="th cbi-section-table-cell">IPv6</div>' +
+									'<div class="th cbi-section-table-cell">Prefix</div>' +
 									'</div>';
 	
 					for (var idx = 0; idx < rv.length; idx++) {
@@ -213,7 +212,7 @@ return view.extend({
 	}
 	
 							
-						}, 10);
+					
 					
 				
 	
@@ -269,7 +268,9 @@ return view.extend({
 										fieldset,
 										statusOlsrCommonJs
 								]);
-						
+								setTimeout(function() {
+									self.render();
+							}, 5000);
 								return result;
 						}
 						else {

@@ -145,7 +145,7 @@ return view.extend({
 					var hna_res;
 					var has_v4;
 					var has_v6;
-
+     var self=this;
 					return	this.action_hna().then(function(result) {
 						hna_res = result.hna;
 						has_v4 = result.has_v4;
@@ -176,14 +176,13 @@ return view.extend({
 					var	info = rv;
 							
 					
-					poll.add(function(info)
-					{
+					
 						var hnadiv = document.getElementById('olsrd_hna');
 						if (hnadiv) {
 								var s = '<div class="tr cbi-section-table-titles">' +
-										'<div class="th cbi-section-table-cell"><%:Announced network%></div>' +
-										'<div class="th cbi-section-table-cell"><%:OLSR gateway%></div>' +
-										'<div class="th cbi-section-table-cell"><%:Validity Time%></div>' +
+										'<div class="th cbi-section-table-cell">Announced network</div>' +
+										'<div class="th cbi-section-table-cell">OLSR gateway</div>' +
+										'<div class="th cbi-section-table-cell">Validity Time</div>' +
 										'</div>';
 						
 								for (var idx = 0; idx < info.length; idx++) {
@@ -209,7 +208,7 @@ return view.extend({
 								hnadiv.innerHTML = s;
 						}
 						
-					}, 10);
+					
 				
 				
 					var i = 1;
@@ -251,7 +250,9 @@ return view.extend({
 							fieldset,
 							statusOlsrCommonJs
 					]);
-					
+					setTimeout(function() {
+						self.render();
+				}, 5000);
 					return result;
 					}).catch(function(error) {
 					 console.error(error);

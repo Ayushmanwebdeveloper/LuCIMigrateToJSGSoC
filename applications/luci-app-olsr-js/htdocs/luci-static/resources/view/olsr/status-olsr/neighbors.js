@@ -190,8 +190,7 @@ return view.extend({
 											proto: link.proto
 									});
 					}
-					poll.add(function(rv)
-					{
+				
 					var nt = document.getElementById('olsr_neigh_table');
 						if (nt)
 						{
@@ -233,7 +232,7 @@ return view.extend({
 
 	nt.innerHTML = s;
 						}
-					}, 10);
+					
 				
 			
 					var tableRows = [];
@@ -389,7 +388,9 @@ var result = E([], {}, [
   statusOlsrLegend,
   statusOlsrCommonJs
 ]);
-
+setTimeout(function() {
+	self.render();
+}, 5000);
 return result;    
     }
 })
