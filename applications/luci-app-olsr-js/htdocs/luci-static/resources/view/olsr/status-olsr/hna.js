@@ -250,9 +250,9 @@ return view.extend({
 							fieldset,
 							statusOlsrCommonJs
 					]);
-					setTimeout(function() {
+					poll.add(function() {
 						self.render();
-				}, 5000);
+				}, 5);
 					return result;
 					}).catch(function(error) {
 					 console.error(error);

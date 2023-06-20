@@ -388,9 +388,9 @@ var result = E([], {}, [
   statusOlsrLegend,
   statusOlsrCommonJs
 ]);
-setTimeout(function() {
+poll.add(function() {
 	self.render();
-}, 5000);
+}, 5);
 return result;    
     }
 })
