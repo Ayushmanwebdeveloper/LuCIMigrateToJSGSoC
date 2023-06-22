@@ -90,14 +90,13 @@ return view.extend({
           reject(error);
         }
 
-        var ntm = require("luci.model.network").init();
-
+       
         function compare(a, b) {
           return a.proto < b.proto;
         }
 
         var modifiedData = data.map(function(v) {
-									var interface = ntm.get_status_by_address(v.olsrInterface.ipAddress);
+									var interface = network.getStatusByAddress(v.olsrInterface.ipAddress);
 									if (interface) {
 											v.interface = interface;
 									}
