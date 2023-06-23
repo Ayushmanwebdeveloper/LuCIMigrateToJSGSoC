@@ -282,4 +282,5 @@ return view.extend({
 				
 			},
 			handleSaveApply: null,
+			handleSave: null,
 })

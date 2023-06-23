@@ -160,4 +160,5 @@ action_interfaces: 	async function () {
 			});
 	},
 	handleSaveApply: null,
+	handleSave: null,
 });

@@ -260,5 +260,6 @@ return view.extend({
 
 					
 				},
-				handleSaveApply: null
+				handleSaveApply: null,
+				handleSave: null,
 })
