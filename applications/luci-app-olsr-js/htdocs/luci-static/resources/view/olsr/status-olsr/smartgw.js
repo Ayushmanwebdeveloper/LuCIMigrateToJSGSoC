@@ -280,5 +280,6 @@ return view.extend({
 					 console.error(error);
 				});
 				
-			}
+			},
+			handleSaveApply: null,
 })

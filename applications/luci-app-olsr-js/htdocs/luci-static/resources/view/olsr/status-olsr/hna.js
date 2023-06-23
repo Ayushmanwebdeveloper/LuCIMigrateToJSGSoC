@@ -259,5 +259,6 @@ return view.extend({
 				});
 
 					
-				}
+				},
+				handleSaveApply: null
 })

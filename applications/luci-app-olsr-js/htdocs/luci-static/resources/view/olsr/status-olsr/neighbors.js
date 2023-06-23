@@ -108,116 +108,126 @@ return view.extend({
 				});
 		});
 	},
-	action_neigh: function () {
-		var self = this;
-		return new Promise(function (resolve, reject) {
-			self
-				.fetch_jsoninfo('links')
-				.then(function ([data, has_v4, has_v6, error]) {
-					if (error) {
-						reject(error);
-					}
 
-					var resolveVal = uci.get('luci_olsr', 'general', 'resolve');
-					var devices;
-					var assoclist = {};
-					var defaultgw;
+	action_neigh: async function() {
+  try {
+    const [data, has_v4, has_v6, error] = await this.fetch_jsoninfo('links');
 
-					network.getWifiDevices().then(function (resolvedDevices) {
-						devices = resolvedDevices;
-					});
+    if (error) {
+      throw error;
+    }
 
-					network.getWANNetworks().then(function (rts) {
-						rts.forEach((rt) => {
-							defaultgw = rt.getGatewayAddr() || '0.0.0.0';
-						});
-					});
+    function compare(a, b) {
+      if (a.proto === b.proto) {
+        return a.linkCost < b.linkCost;
+      } else {
+        return a.proto < b.proto;
+      }
+    }
 
-					function compare(a, b) {
-						if (a.proto === b.proto) {
-							return a.linkCost < b.linkCost;
-						} else {
-							return a.proto < b.proto;
-						}
-					}
+    let assoclist = [];
+    const resolveVal = uci.get('luci_olsr', 'general', 'resolve');
+    let devices;
+    let defaultgw;
 
-					var assoclist = [];
+    devices = await network.getWifiDevices();
+    const rts = await network.getWANNetworks();
 
-					devices.forEach(function (dev) {
-						dev.getWifiNetworks().forEach(function (net) {
-							var radio = network.getDevice(net);
-							assoclist.push({
-								ifname: network.getIfnameOf(net),
-								network: network.getNetwork(name),
-								device: radio ? radio.getName() : null,
-								list: net.getAssocList(),
-							});
-						});
-					});
+    rts.forEach(function (rt) {
+      defaultgw = rt.getGatewayAddr() || '0.0.0.0';
+    });
 
-					var modifiedData = data.map(function (v) {
-						var snr = 0;
-						var signal = 0;
-						var noise = 0;
-						var mac = '';
-						var ip;
-						var neihgt = [];
+    const networkPromises = devices.map(async function (dev) {
+      const networks = await dev.getWifiNetworks();
 
-						network.getHostHints().then(function (hosthints) {
-							if (resolveVal === '1') {
-								var hostname = hosthints.getHostnameByIPAddr(v.gateway);
-								if (hostname) {
-									v.hostname = hostname;
-								}
-							}
-						});
-						var interface = network.getStatusByAddress(v.localIP);
-						var lmac = getMACAddrByIPAddr(v.localIP);
-						var rmac = getMACAddrByIPAddr(v.remoteIP);
+      const promiseArr = networks.map(async function (net) {
+        const radio = await network.getDevice(net);
+        const [ifname, network, device, list] = await Promise.all([
+          network.getIfnameOf(net),
+          network.getNetwork(net.getName()),
+          radio ? radio.getName() : null,
+          net.getAssocList(),
+        ]);
 
-						for (var i = 0; i < assoclist.length; i++) {
-							var val = assoclist[i];
-							if (val.network === interface && val.list) {
-								for (var assocmac in val.list) {
-									var assot = val.list[assocmac];
-									if (rmac == assocmac) {
-										signal = parseInt(assot.signal);
-										noise = parseInt(assot.noise);
-										snr = noise * -1 - signal * -1;
-									}
-								}
-							}
-						}
+        assoclist.push({
+          ifname: ifname,
+          network: network,
+          device: device,
+          list: list,
+        });
+      });
 
-						if (interface) {
-							v.interface = interface;
-						}
-						v.snr = snr || null;
-						v.signal = signal || null;
-						v.noise = noise || null;
-						if (rmac) {
-							v.remoteMAC = rmac;
-						}
-						if (lmac) {
-							v.localMAC = lmac;
-						}
+      await Promise.all(promiseArr);
+    });
 
-						if (defaultgw === v.remoteIP) {
-							v.defaultgw = 1;
-						}
-						return v;
-					});
+    await Promise.all(networkPromises);
 
-					modifiedData.sort(compare);
+				const hosthints = await network.getHostHints();
+    const modifiedData = await Promise.all(
+      data.map(async function (v) {
+        const snr = 0;
+        let signal = 0;
+        let noise = 0;
+        let mac = '';
+        let ip;
+        let neihgt = [];
 
-					var result = { links: modifiedData, has_v4: has_v4, has_v6: has_v6 };
-					resolve(result);
-				})
-				.catch(function (err) {
-					reject(err);
-				});
-		});
-	},
+        if (resolveVal === '1') {
+         
+          const hostname = await hosthints.getHostnameByIPAddr(v.gateway);
+          if (hostname) {
+            v.hostname = hostname;
+          }
+        }
+
+        const interfac = await network.getStatusByAddress(v.localIP);
+        const lmac = await hosthints.getMACAddrByIPAddr(v.localIP);
+        const rmac = await hosthints.getMACAddrByIPAddr(v.remoteIP);
+
+        for (let i = 0; i < assoclist.length; i++) {
+          const val = assoclist[i];
+          if (val.network === interfac && val.list) {
+            for (const assocmac in val.list) {
+              const assot = val.list[assocmac];
+              if (rmac == assocmac) {
+                signal = parseInt(assot.signal);
+                noise = parseInt(assot.noise);
+                snr = noise * -1 - signal * -1;
+              }
+            }
+          }
+        }
+
+        if (interfac) {
+          v.interface = interfac;
+        }
+        v.snr = snr || null;
+        v.signal = signal || null;
+        v.noise = noise || null;
+        if (rmac) {
+          v.remoteMAC = rmac;
+        }
+        if (lmac) {
+          v.localMAC = lmac;
+        }
+
+        if (defaultgw === v.remoteIP) {
+          v.defaultgw = 1;
+        }
+        return v;
+      })
+    );
+
+    modifiedData.sort(compare);
+
+    const result = { links: modifiedData, has_v4: has_v4, has_v6: has_v6 };
+    return result;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+},
+
 	load: function () {
 		return Promise.all([uci.load('olsrd'), uci.load('system')]);
 	},
@@ -236,8 +246,8 @@ return view.extend({
 				var table = E('div', { 'class': 'table cbi-section-table', 'id': 'olsr_neigh_table' }, [E('div', { 'class': 'tr cbi-section-table-cell' }, [E('div', { 'class': 'th cbi-section-table-cell' }, _('Neighbour IP')), E('div', { 'class': 'th cbi-section-table-cell' }, _('Hostname')), E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')), E('div', { 'class': 'th cbi-section-table-cell' }, _('Local interface IP')), E('div', { 'class': 'th cbi-section-table-cell' }, 'LQ'), E('div', { 'class': 'th cbi-section-table-cell' }, 'NLQ'), E('div', { 'class': 'th cbi-section-table-cell' }, 'ETX'), E('div', { 'class': 'th cbi-section-table-cell' }, 'SNR')])]);
 
 				var rv = [];
-				for (var k = 0; k < links.length; k++) {
-					var link = links[k];
+				for (var k = 0; k < neigh_res.length; k++) {
+					var link = neigh_res[k];
 					link.linkCost = parseInt(link.linkCost) || 0;
 					if (link.linkCost === 4194304) {
 						link.linkCost = 0;
@@ -269,7 +279,7 @@ return view.extend({
 
 				var nt = document.getElementById('olsr_neigh_table');
 				if (nt) {
-					var s = '<div class="tr cbi-section-table-cell">' + '<div class="th cbi-section-table-cell"><%:Neighbour IP%></div>' + '<div class="th cbi-section-table-cell"><%:Hostname%></div>' + '<div class="th cbi-section-table-cell"><%:Interface%></div>' + '<div class="th cbi-section-table-cell"><%:Local interface IP%></div>' + '<div class="th cbi-section-table-cell">LQ</div>' + '<div class="th cbi-section-table-cell">NLQ</div>' + '<div class="th cbi-section-table-cell">ETX</div>' + '<div class="th cbi-section-table-cell">SNR</div>' + '</div>';
+					var s = '<div class="tr cbi-section-table-cell">' + '<div class="th cbi-section-table-cell">Neighbour IP</div>' + '<div class="th cbi-section-table-cell">Hostname</div>' + '<div class="th cbi-section-table-cell">Interface</div>' + '<div class="th cbi-section-table-cell">Local interface IP</div>' + '<div class="th cbi-section-table-cell">LQ</div>' + '<div class="th cbi-section-table-cell">NLQ</div>' + '<div class="th cbi-section-table-cell">ETX</div>' + '<div class="th cbi-section-table-cell">SNR</div>' + '</div>';
 
 					for (var idx = 0; idx < rv.length; idx++) {
 						var neigh = rv[idx];
@@ -292,8 +302,8 @@ return view.extend({
 
 				var i = 1;
 
-				for (var k = 0; k < links.length; k++) {
-					var link = links[k];
+				for (var k = 0; k < neigh_res.length; k++) {
+					var link = neigh_res[k];
 					link.linkCost = parseInt(link.linkCost) || 0;
 					if (link.linkCost === 4194304) {
 						link.linkCost = 0;
@@ -439,4 +449,5 @@ return view.extend({
 				console.error(error);
 			});
 	},
+	handleSaveApply: null,
 });

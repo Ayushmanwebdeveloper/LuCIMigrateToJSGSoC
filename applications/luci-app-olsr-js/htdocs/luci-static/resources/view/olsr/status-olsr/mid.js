@@ -178,7 +178,6 @@ return view.extend({
 					}).catch(function(error) {
 					 console.error(error);
 				});
-					
-								
-    }
+				},
+				handleSaveApply: null,
 });

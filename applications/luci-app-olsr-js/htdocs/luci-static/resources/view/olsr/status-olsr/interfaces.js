@@ -81,41 +81,40 @@ return view.extend({
 		});
 	},
 
-	action_interfaces: function () {
-		var self = this;
-		return new Promise(function (resolve, reject) {
-			self
-				.fetch_jsoninfo('interfaces')
-				.then(function ([data, has_v4, has_v6, error]) {
-					if (error) {
-						reject(error);
-					}
+action_interfaces: 	async function () {
+  try {
+    const [data, has_v4, has_v6, error] = await this.fetch_jsoninfo('interfaces');
+    
+    if (error) {
+      throw error;
+    }
+    
+    function compare(a, b) {
+      return a.proto < b.proto;
+    }
+    
+    const modifiedData = await Promise.all(data.map(async function (v) {
+      const interfac = await network.getStatusByAddress(v.olsrInterface.ipAddress);
+      if (interfac) {
+        v.interface = interfac;
+      }
+      return v;
+    }));
+    
+    modifiedData.sort(compare);
+    
+    const result = {
+      iface: modifiedData,
+      has_v4: has_v4,
+      has_v6: has_v6,
+    };
+    
+    return result;
+  } catch (err) {
+    throw err;
+  }
+},
 
-					function compare(a, b) {
-						return a.proto < b.proto;
-					}
-
-					var modifiedData = data.map(function (v) {
-						var interface = network.getStatusByAddress(v.olsrInterface.ipAddress);
-						if (interface) {
-							v.interface = interface;
-						}
-						return v;
-					});
-
-					modifiedData.sort(compare);
-					var result = {
-						iface: modifiedData,
-						has_v4: has_v4,
-						has_v6: has_v6,
-					};
-					resolve(result);
-				})
-				.catch(function (err) {
-					reject(err);
-				});
-		});
-	},
 
 	load: function () {
 		return Promise.all([uci.load('olsrd'), uci.load('system')]);
@@ -160,4 +159,5 @@ return view.extend({
 				console.error(error);
 			});
 	},
+	handleSaveApply: null,
 });
