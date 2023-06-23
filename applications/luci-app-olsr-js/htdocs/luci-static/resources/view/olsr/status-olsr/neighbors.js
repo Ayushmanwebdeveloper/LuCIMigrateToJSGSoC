@@ -1,9 +1,10 @@
-"use strict";
-"require uci";
-"require view";
-"require poll";
-"require rpc";
-"require ui";
+'use strict';
+'require uci';
+'require view';
+'require poll';
+'require rpc';
+'require ui';
+'require network';
 
 function etx_color(etx) {
   let color = "#bb3333";

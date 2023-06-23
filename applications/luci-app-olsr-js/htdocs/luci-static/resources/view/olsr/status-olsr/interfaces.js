@@ -3,6 +3,7 @@
 'require view';
 'require rpc';
 'require ui';
+'require network';
 
 return view.extend({
 
