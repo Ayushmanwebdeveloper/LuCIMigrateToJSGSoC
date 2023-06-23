@@ -11,7 +11,7 @@
 			"order": 15,
 			"action": {
 					"type": "view",
-					"path": "olsr/status-olsr/neighbours"
+					"path": "olsr/status-olsr/neighbors"
 			}
 	},
 	"olsr/routes": {
@@ -44,6 +44,14 @@
 		"action": {
 				"type": "view",
 				"path": "olsr/status-olsr/mid"
+		}
+	},
+	"olsr/interface": {
+		"title": "Interface",
+		"order": 35,
+		"action": {
+				"type": "view",
+				"path": "olsr/status-olsr/interfaces"
 		}
 	},
 	"olsr/smartgw": {
