@@ -19,7 +19,8 @@
 				"/etc/modules.d": [
 					"list",
 					"read"
-				]
+				],
+				"/usr/lib": [ "list" ]
 			},
 			"uci": [
 				"luci_olsr",
