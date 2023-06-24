@@ -8,6 +8,32 @@
 'require fs';
 
 return view.extend({
+	load: function () {
+		const plugins = {};
+		uci.sections('olsrd', 'LoadPlugin', (section) => {
+			if (section.library && !plugins[section.library]) {
+				plugins[section.library] = true;
+			}
+		});
+		return	Promise.all([
+			fs.list('/usr/lib').then((files) => {
+				
+				files.forEach((v) => {
+						if (v.name.substr(0, 6) === 'olsrd_') {
+								var pluginname = v.name.match(/^(olsrd.*)\.so\..*/)[1];
+								if (!plugins[pluginname]) {
+										if (!uci.get('olsrd', pluginname)) {
+														var sid = uci.add('olsrd', 'LoadPlugin', pluginname);
+														uci.set('olsrd', sid, 'ignore', '1');
+														uci.set('olsrd', sid, 'library', pluginname);
+												
+										}
+								}
+						}
+				});
+		})
+		])
+	},
 	render: function () {
 		var pathname = window.location.pathname;
 		var segments = pathname.split('/');
@@ -232,35 +258,18 @@ return view.extend({
 		} else {
 			var 	mpi = new form.Map('olsrd', _('OLSR - Plugins'));
 
-			const plugins = {};
-			uci.sections('olsrd', 'LoadPlugin', (section) => {
-				if (section.library && !plugins[section.library]) {
-					plugins[section.library] = true;
-				}
-			});
 
 
-			fs.list('/usr/lib').then((files) => {
-				files.forEach((v) => {
-						if (v.name.substr(0, 6) === 'olsrd_') {
-							var	pluginname = v.name.match(/^(olsrd.*)\.so\..*/)[1];
-								if (!plugins[pluginname]) {
-										var sid = uci.add('olsrd', 'LoadPlugin');
-										uci.set('olsrd', sid, 'ignore', '1');
-										uci.set('olsrd', sid, 'library', pluginname);
-								}
-						}
-				});
-		
+
+			
+		 
 				var t = mpi.section(form.TableSection, 'LoadPlugin', _('Plugins'));
 				t.anonymous = true;
-				t.template = 'cbi/tblsection';
-				t.override_scheme = true;
 		
-				t.extedit = function (section_id) {
-						var lib = uci.get(section_id, 'library') || '';
-						return '/cgi-bin/luci/admin/services/olsrd/plugins/' + lib;
-				};
+				// t.extedit = function (section_id) {
+				// 		var lib = uci.get(section_id, 'library') || '';
+				// 		return '/cgi-bin/luci/admin/services/olsrd/plugins/' + lib;
+				// };
 		
 				var ign = t.option(form.Flag, 'ignore', _('Enabled'));
 				ign.enabled = '0';
@@ -274,11 +283,9 @@ return view.extend({
 				t.option(form.DummyValue, 'library', _('Library'));
 		
 				return mpi.render();
-		})
-		.catch((err) => {
-			console.error(err);
-		});
-		
+			
+
+	
 		}
 	},
 });
