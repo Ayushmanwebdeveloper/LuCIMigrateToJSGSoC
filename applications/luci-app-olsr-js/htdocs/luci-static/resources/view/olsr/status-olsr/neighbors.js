@@ -63,7 +63,7 @@ return view.extend({
 					var has_v6 = false;
 
 					if (jsonreq4 === '' && jsonreq6 === '') {
-						window.location.href = 'status-olsr/error_olsr';
+						window.location.href = 'error_olsr';
 						reject([null, 0, 0, true]);
 						return;
 					}
@@ -109,131 +109,125 @@ return view.extend({
 		});
 	},
 
-	action_neigh: async function() {
-  try {
-    const [data, has_v4, has_v6, error] = await this.fetch_jsoninfo('links');
+	action_neigh: async function () {
+		try {
+			const [data, has_v4, has_v6, error] = await this.fetch_jsoninfo('links');
 
-    if (error) {
-      throw error;
-    }
+			if (error) {
+				throw error;
+			}
 
-    function compare(a, b) {
-      if (a.proto === b.proto) {
-        return a.linkCost < b.linkCost;
-      } else {
-        return a.proto < b.proto;
-      }
-    }
+			function compare(a, b) {
+				if (a.proto === b.proto) {
+					return a.linkCost < b.linkCost;
+				} else {
+					return a.proto < b.proto;
+				}
+			}
 
-    let assoclist = [];
-    const resolveVal = uci.get('luci_olsr', 'general', 'resolve');
-    let devices;
-    let defaultgw;
+			let assoclist = [];
+			const resolveVal = uci.get('luci_olsr', 'general', 'resolve');
+			let devices;
+			let defaultgw;
 
-    devices = await network.getWifiDevices();
-    const rts = await network.getWANNetworks();
+			devices = await network.getWifiDevices();
+			const rts = await network.getWANNetworks();
 
-    rts.forEach(function (rt) {
-      defaultgw = rt.getGatewayAddr() || '0.0.0.0';
-    });
+			rts.forEach(function (rt) {
+				defaultgw = rt.getGatewayAddr() || '0.0.0.0';
+			});
 
-    const networkPromises = devices.map(async function (dev) {
-      const networks = await dev.getWifiNetworks();
+			const networkPromises = devices.map(async function (dev) {
+				const networks = await dev.getWifiNetworks();
 
-      const promiseArr = networks.map(async function (net) {
-        const radio = await network.getDevice(net);
-        const [ifname, network, device, list] = await Promise.all([
-          network.getIfnameOf(net),
-          network.getNetwork(net.getName()),
-          radio ? radio.getName() : null,
-          net.getAssocList(),
-        ]);
+				const promiseArr = networks.map(async function (net) {
+					const radio = await network.getDevice(net);
+					const [ifname, network, device, list] = await Promise.all([network.getIfnameOf(net), network.getNetwork(net.getName()), radio ? radio.getName() : null, net.getAssocList()]);
 
-        assoclist.push({
-          ifname: ifname,
-          network: network,
-          device: device,
-          list: list,
-        });
-      });
+					assoclist.push({
+						ifname: ifname,
+						network: network,
+						device: device,
+						list: list,
+					});
+				});
 
-      await Promise.all(promiseArr);
-    });
+				await Promise.all(promiseArr);
+			});
 
-    await Promise.all(networkPromises);
+			await Promise.all(networkPromises);
 
-				const hosthints = await network.getHostHints();
-    const modifiedData = await Promise.all(
-      data.map(async function (v) {
-        const snr = 0;
-        let signal = 0;
-        let noise = 0;
-        let mac = '';
-        let ip;
-        let neihgt = [];
+			const hosthints = await network.getHostHints();
+			const modifiedData = await Promise.all(
+				data.map(async function (v) {
+					const snr = 0;
+					let signal = 0;
+					let noise = 0;
+					let mac = '';
+					let ip;
+					let neihgt = [];
 
-        if (resolveVal === '1') {
-         
-          const hostname = await hosthints.getHostnameByIPAddr(v.gateway);
-          if (hostname) {
-            v.hostname = hostname;
-          }
-        }
+					if (resolveVal === '1') {
+						const hostname = await hosthints.getHostnameByIPAddr(v.gateway);
+						if (hostname) {
+							v.hostname = hostname;
+						}
+					}
 
-        const interfac = await network.getStatusByAddress(v.localIP);
-        const lmac = await hosthints.getMACAddrByIPAddr(v.localIP);
-        const rmac = await hosthints.getMACAddrByIPAddr(v.remoteIP);
+					const interfac = await network.getStatusByAddress(v.localIP);
+					const lmac = await hosthints.getMACAddrByIPAddr(v.localIP);
+					const rmac = await hosthints.getMACAddrByIPAddr(v.remoteIP);
 
-        for (let i = 0; i < assoclist.length; i++) {
-          const val = assoclist[i];
-          if (val.network === interfac && val.list) {
-            for (const assocmac in val.list) {
-              const assot = val.list[assocmac];
-              if (rmac == assocmac) {
-                signal = parseInt(assot.signal);
-                noise = parseInt(assot.noise);
-                snr = noise * -1 - signal * -1;
-              }
-            }
-          }
-        }
+					for (let i = 0; i < assoclist.length; i++) {
+						const val = assoclist[i];
+						if (val.network === interfac && val.list) {
+							for (const assocmac in val.list) {
+								const assot = val.list[assocmac];
+								if (rmac == assocmac) {
+									signal = parseInt(assot.signal);
+									noise = parseInt(assot.noise);
+									snr = noise * -1 - signal * -1;
+								}
+							}
+						}
+					}
 
-        if (interfac) {
-          v.interface = interfac;
-        }
-        v.snr = snr || null;
-        v.signal = signal || null;
-        v.noise = noise || null;
-        if (rmac) {
-          v.remoteMAC = rmac;
-        }
-        if (lmac) {
-          v.localMAC = lmac;
-        }
+					if (interfac) {
+						v.interface = interfac;
+					}
+					v.snr = snr || null;
+					v.signal = signal || null;
+					v.noise = noise || null;
+					if (rmac) {
+						v.remoteMAC = rmac;
+					}
+					if (lmac) {
+						v.localMAC = lmac;
+					}
 
-        if (defaultgw === v.remoteIP) {
-          v.defaultgw = 1;
-        }
-        return v;
-      })
-    );
+					if (defaultgw === v.remoteIP) {
+						v.defaultgw = 1;
+					}
+					return v;
+				})
+			);
 
-    modifiedData.sort(compare);
+			modifiedData.sort(compare);
 
-    const result = { links: modifiedData, has_v4: has_v4, has_v6: has_v6 };
-    return result;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-},
+			const result = { links: modifiedData, has_v4: has_v4, has_v6: has_v6 };
+			return result;
+		} catch (err) {
+			console.error(err);
+			throw err;
+		}
+	},
 
 	load: function () {
 		var self = this;
-		poll.add(function() {
+		poll.add(function () {
 			self.render();
-	}, 5);
-		return Promise.all([uci.load('olsrd'),uci.load('luci_olsr')   ]);
+		}, 5);
+		return Promise.all([uci.load('olsrd'), uci.load('luci_olsr')]);
 	},
 	render: function () {
 		var neigh_res;
@@ -247,7 +241,18 @@ return view.extend({
 				has_v4 = result.has_v4;
 				has_v6 = result.has_v6;
 
-				var table = E('div', { 'class': 'table cbi-section-table', 'id': 'olsr_neigh_table' }, [E('div', { 'class': 'tr cbi-section-table-cell' }, [E('div', { 'class': 'th cbi-section-table-cell' }, _('Neighbour IP')), E('div', { 'class': 'th cbi-section-table-cell' }, _('Hostname')), E('div', { 'class': 'th cbi-section-table-cell' }, _('Interface')), E('div', { 'class': 'th cbi-section-table-cell' }, _('Local interface IP')), E('div', { 'class': 'th cbi-section-table-cell' }, 'LQ'), E('div', { 'class': 'th cbi-section-table-cell' }, 'NLQ'), E('div', { 'class': 'th cbi-section-table-cell' }, 'ETX'), E('div', { 'class': 'th cbi-section-table-cell' }, 'SNR')])]);
+				var table = E('div', { class: 'table cbi-section-table', id: 'olsr_neigh_table' }, [
+					E('div', { class: 'tr cbi-section-table-cell' }, [
+						E('div', { class: 'th cbi-section-table-cell' }, _('Neighbour IP')),
+						E('div', { class: 'th cbi-section-table-cell' }, _('Hostname')),
+						E('div', { class: 'th cbi-section-table-cell' }, _('Interface')),
+						E('div', { class: 'th cbi-section-table-cell' }, _('Local interface IP')),
+						E('div', { class: 'th cbi-section-table-cell' }, 'LQ'),
+						E('div', { class: 'th cbi-section-table-cell' }, 'NLQ'),
+						E('div', { class: 'th cbi-section-table-cell' }, 'ETX'),
+						E('div', { class: 'th cbi-section-table-cell' }, 'SNR'),
+					]),
+				]);
 
 				var rv = [];
 				for (var k = 0; k < neigh_res.length; k++) {
@@ -283,22 +288,91 @@ return view.extend({
 
 				var nt = document.getElementById('olsr_neigh_table');
 				if (nt) {
-					var s = '<div class="tr cbi-section-table-cell">' + '<div class="th cbi-section-table-cell">Neighbour IP</div>' + '<div class="th cbi-section-table-cell">Hostname</div>' + '<div class="th cbi-section-table-cell">Interface</div>' + '<div class="th cbi-section-table-cell">Local interface IP</div>' + '<div class="th cbi-section-table-cell">LQ</div>' + '<div class="th cbi-section-table-cell">NLQ</div>' + '<div class="th cbi-section-table-cell">ETX</div>' + '<div class="th cbi-section-table-cell">SNR</div>' + '</div>';
+					var s =
+						'<div class="tr cbi-section-table-cell">' +
+						'<div class="th cbi-section-table-cell">Neighbour IP</div>' +
+						'<div class="th cbi-section-table-cell">Hostname</div>' +
+						'<div class="th cbi-section-table-cell">Interface</div>' +
+						'<div class="th cbi-section-table-cell">Local interface IP</div>' +
+						'<div class="th cbi-section-table-cell">LQ</div>' +
+						'<div class="th cbi-section-table-cell">NLQ</div>' +
+						'<div class="th cbi-section-table-cell">ETX</div>' +
+						'<div class="th cbi-section-table-cell">SNR</div>' +
+						'</div>';
 
 					for (var idx = 0; idx < rv.length; idx++) {
 						var neigh = rv[idx];
 
 						if (neigh.proto == '6') {
-							s += '<div class="tr cbi-section-table-row cbi-rowstyle-' + (1 + (idx % 2)) + ' proto-' + neigh.proto + '">' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '"><a href="http://[' + neigh.rip + ']/cgi-bin-status.html">' + neigh.rip + '</a></div>';
+							s +=
+								'<div class="tr cbi-section-table-row cbi-rowstyle-' +
+								(1 + (idx % 2)) +
+								' proto-' +
+								neigh.proto +
+								'">' +
+								'<div class="td cbi-section-table-cell left" style="background-color:' +
+								neigh.dfgcolor +
+								'"><a href="http://[' +
+								neigh.rip +
+								']/cgi-bin-status.html">' +
+								neigh.rip +
+								'</a></div>';
 						} else {
-							s += '<div class="tr cbi-section-table-row cbi-rowstyle-' + (1 + (idx % 2)) + ' proto-' + neigh.proto + '">' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '"><a href="http://' + neigh.rip + '/cgi-bin-status.html">' + neigh.rip + '</a></div>';
+							s +=
+								'<div class="tr cbi-section-table-row cbi-rowstyle-' +
+								(1 + (idx % 2)) +
+								' proto-' +
+								neigh.proto +
+								'">' +
+								'<div class="td cbi-section-table-cell left" style="background-color:' +
+								neigh.dfgcolor +
+								'"><a href="http://' +
+								neigh.rip +
+								'/cgi-bin-status.html">' +
+								neigh.rip +
+								'</a></div>';
 						}
 						if (neigh.hn) {
 							s += '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '"><a href="http://' + neigh.hn + '/cgi-bin-status.html">' + neigh.hn + '</a></div>';
 						} else {
 							s += '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '">?</div>';
 						}
-						s += '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '">' + neigh.ifn + '</div>' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '">' + neigh.lip + '</div>' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '">' + neigh.lq + '</div>' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.dfgcolor + '">' + neigh.nlq + '</div>' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.color + '">' + neigh.cost + '</div>' + '<div class="td cbi-section-table-cell left" style="background-color:' + neigh.snr_color + '" title="Signal: ' + neigh.signal + ' Noise: ' + neigh.noise + '">' + (neigh.snr || '?') + '</div>' + '</div>';
+						s +=
+							'<div class="td cbi-section-table-cell left" style="background-color:' +
+							neigh.dfgcolor +
+							'">' +
+							neigh.ifn +
+							'</div>' +
+							'<div class="td cbi-section-table-cell left" style="background-color:' +
+							neigh.dfgcolor +
+							'">' +
+							neigh.lip +
+							'</div>' +
+							'<div class="td cbi-section-table-cell left" style="background-color:' +
+							neigh.dfgcolor +
+							'">' +
+							neigh.lq +
+							'</div>' +
+							'<div class="td cbi-section-table-cell left" style="background-color:' +
+							neigh.dfgcolor +
+							'">' +
+							neigh.nlq +
+							'</div>' +
+							'<div class="td cbi-section-table-cell left" style="background-color:' +
+							neigh.color +
+							'">' +
+							neigh.cost +
+							'</div>' +
+							'<div class="td cbi-section-table-cell left" style="background-color:' +
+							neigh.snr_color +
+							'" title="Signal: ' +
+							neigh.signal +
+							' Noise: ' +
+							neigh.noise +
+							'">' +
+							(neigh.snr || '?') +
+							'</div>' +
+							'</div>';
 					}
 
 					nt.innerHTML = s;
@@ -328,21 +402,21 @@ return view.extend({
 					var tr = E(
 						'div',
 						{
-							'class': 'tr cbi-section-table-row cbi-rowstyle-' + i + ' proto-' + link.proto,
+							class: 'tr cbi-section-table-row cbi-rowstyle-' + i + ' proto-' + link.proto,
 						},
 						[
 							link.proto === '6'
 								? E(
 										'div',
 										{
-											'class': 'td cbi-section-table-cell left',
-											'style': 'background-color:' + defaultgw_color,
+											class: 'td cbi-section-table-cell left',
+											style: 'background-color:' + defaultgw_color,
 										},
 										[
 											E(
 												'a',
 												{
-													'href': 'http://[' + link.remoteIP + ']/cgi-bin-status.html',
+													href: 'http://[' + link.remoteIP + ']/cgi-bin-status.html',
 												},
 												link.remoteIP
 											),
@@ -351,14 +425,14 @@ return view.extend({
 								: E(
 										'div',
 										{
-											'class': 'td cbi-section-table-cell left',
-											'style': 'background-color:' + defaultgw_color,
+											class: 'td cbi-section-table-cell left',
+											style: 'background-color:' + defaultgw_color,
 										},
 										[
 											E(
 												'a',
 												{
-													'href': 'http://' + link.remoteIP + '/cgi-bin-status.html',
+													href: 'http://' + link.remoteIP + '/cgi-bin-status.html',
 												},
 												link.remoteIP
 											),
@@ -367,57 +441,57 @@ return view.extend({
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + defaultgw_color,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + defaultgw_color,
 								},
-								[E('a', { 'href': 'http://' + link.hostname + '/cgi-bin-status.html' }, link.hostname)]
+								[E('a', { href: 'http://' + link.hostname + '/cgi-bin-status.html' }, link.hostname)]
 							),
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + defaultgw_color,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + defaultgw_color,
 								},
 								link.interface
 							),
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + defaultgw_color,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + defaultgw_color,
 								},
 								link.localIP
 							),
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + defaultgw_color,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + defaultgw_color,
 								},
 								[E('div', {}, link.linkQuality.toFixed(3))]
 							),
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + defaultgw_color,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + defaultgw_color,
 								},
 								[E('div', {}, link.neighborLinkQuality.toFixed(3))]
 							),
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + color,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + color,
 								},
 								[E('div', {}, link.linkCost.toFixed(3))]
 							),
 							E(
 								'div',
 								{
-									'class': 'td cbi-section-table-cell left',
-									'style': 'background-color:' + snr_color,
-									'title': 'Signal: ' + link.signal + ' Noise: ' + link.noise,
+									class: 'td cbi-section-table-cell left',
+									style: 'background-color:' + snr_color,
+									title: 'Signal: ' + link.signal + ' Noise: ' + link.noise,
 								},
 								link.snr
 							),
@@ -428,11 +502,35 @@ return view.extend({
 					i = (i % 2) + 1;
 				}
 
-				var fieldset = E('fieldset', { 'class': 'cbi-section' }, [E('legend', {}, _('Overview of currently established OLSR connections')), table]);
+				var fieldset = E('fieldset', { class: 'cbi-section' }, [E('legend', {}, _('Overview of currently established OLSR connections')), table]);
 
-				var h2 = E('h2', { 'name': 'content' }, _('OLSR connections'));
-				var divToggleButtons = E('div', { 'id': 'togglebuttons' });
-				var statusOlsrLegend = E('div', {}, [E('h3', {}, [_('Legend') + ':']), E('ul', {}, [E('li', {}, [E('strong', {}, [_('LQ: ')]), _('Success rate of packages received from the neighbour')]), E('li', {}, [E('strong', {}, [_('NLQ: ')]), _('Success rate of packages sent to the neighbour')]), E('li', {}, [E('strong', {}, [_('ETX: ')]), _('Expected retransmission count')]), E('li', { 'style': 'list-style: none' }, [E('ul', {}, [E('li', {}, [E('strong', { style: 'color:#00cc00' }, [_('Green')]), ':', _('Very good (ETX < 2)')]), E('li', {}, [E('strong', { 'style': 'color:#ffcb05' }, [_('Yellow')]), ':', _('Good (2 < ETX < 4)')]), E('li', {}, [E('strong', { 'style': 'color:#ff6600' }, [_('Orange')]), ':', _('Still usable (4 < ETX < 10)')]), E('li', {}, [E('strong', { 'style': 'color:#bb3333' }, [_('Red')]), ':', _('Bad (ETX > 10)')])])]), E('li', {}, [E('strong', {}, [_('SNR: ')]), _('Signal Noise Ratio in dB')]), E('li', { 'style': 'list-style: none' }, [E('ul', {}, [E('li', {}, [E('strong', { style: 'color:#00cc00' }, [_('Green')]), ':', _('Very good (SNR > 30)')]), E('li', {}, [E('strong', { 'style': 'color:#ffcb05' }, [_('Yellow')]), ':', _('Good (30 > SNR > 20)')]), E('li', {}, [E('strong', { style: 'color:#ff6600' }, [_('Orange')]), ':', _('Still usable (20 > SNR > 5)')]), E('li', {}, [E('strong', { 'style': 'color:#bb3333' }, [_('Red')]), ':', _('Bad (SNR < 5)')])])])])]);
+				var h2 = E('h2', { name: 'content' }, _('OLSR connections'));
+				var divToggleButtons = E('div', { id: 'togglebuttons' });
+				var statusOlsrLegend = E('div', {}, [
+					E('h3', {}, [_('Legend') + ':']),
+					E('ul', {}, [
+						E('li', {}, [E('strong', {}, [_('LQ: ')]), _('Success rate of packages received from the neighbour')]),
+						E('li', {}, [E('strong', {}, [_('NLQ: ')]), _('Success rate of packages sent to the neighbour')]),
+						E('li', {}, [E('strong', {}, [_('ETX: ')]), _('Expected retransmission count')]),
+						E('li', { style: 'list-style: none' }, [
+							E('ul', {}, [
+								E('li', {}, [E('strong', { style: 'color:#00cc00' }, [_('Green')]), ':', _('Very good (ETX < 2)')]),
+								E('li', {}, [E('strong', { style: 'color:#ffcb05' }, [_('Yellow')]), ':', _('Good (2 < ETX < 4)')]),
+								E('li', {}, [E('strong', { style: 'color:#ff6600' }, [_('Orange')]), ':', _('Still usable (4 < ETX < 10)')]),
+								E('li', {}, [E('strong', { style: 'color:#bb3333' }, [_('Red')]), ':', _('Bad (ETX > 10)')]),
+							]),
+						]),
+						E('li', {}, [E('strong', {}, [_('SNR: ')]), _('Signal Noise Ratio in dB')]),
+						E('li', { style: 'list-style: none' }, [
+							E('ul', {}, [
+								E('li', {}, [E('strong', { style: 'color:#00cc00' }, [_('Green')]), ':', _('Very good (SNR > 30)')]),
+								E('li', {}, [E('strong', { style: 'color:#ffcb05' }, [_('Yellow')]), ':', _('Good (30 > SNR > 20)')]),
+								E('li', {}, [E('strong', { style: 'color:#ff6600' }, [_('Orange')]), ':', _('Still usable (20 > SNR > 5)')]),
+								E('li', {}, [E('strong', { style: 'color:#bb3333' }, [_('Red')]), ':', _('Bad (SNR < 5)')]),
+							]),
+						]),
+					]),
+				]);
 
 				var statusOlsrCommonJs = null;
 

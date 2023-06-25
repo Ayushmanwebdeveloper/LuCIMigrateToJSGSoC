@@ -3,7 +3,7 @@
 		"title": "OLSR IPv4",
 		"order": 5,
 		"depends": {
-						"acl" : ["luci-app-olsr"]
+			"acl": ["luci-app-olsr"]
 		},
 		"action": {
 			"type": "view",
@@ -38,8 +38,8 @@
 		"title": "OLSR IPv6",
 		"order": 5,
 		"depends": {
-			"acl" : ["luci-app-olsr"]
-  },
+			"acl": ["luci-app-olsr"]
+		},
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrd6"

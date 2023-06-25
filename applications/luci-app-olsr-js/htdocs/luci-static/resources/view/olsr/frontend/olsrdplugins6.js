@@ -9,29 +9,28 @@ return view.extend({
 	load: function () {
 		return Promise.all([
 			uci.load('olsrd6').then(() => {
-					return fs.list('/usr/lib').then((files) => {
-						const sections = uci.sections('olsrd6', 'LoadPlugin');
-						const libsArr = [];
-						sections.forEach((section) => {
-								const lib = section.library;
-								libsArr.push(lib);
-						});
-						
-							files.forEach((v) => {
-									if (v.name.substr(0, 6) === 'olsrd_') {
-											var pluginname = v.name.match(/^(olsrd_.*)\.so\..*/)[1];
-	
-											if (!libsArr.includes(pluginname)) {
-													var sid = uci.add('olsrd6', 'LoadPlugin');
-													uci.set('olsrd6', sid, 'ignore', '1');
-													uci.set('olsrd6', sid, 'library', pluginname);
-											}
-									}
-							});
+				return fs.list('/usr/lib').then((files) => {
+					const sections = uci.sections('olsrd6', 'LoadPlugin');
+					const libsArr = [];
+					sections.forEach((section) => {
+						const lib = section.library;
+						libsArr.push(lib);
 					});
-			})
-	]);
-	
+
+					files.forEach((v) => {
+						if (v.name.substr(0, 6) === 'olsrd_') {
+							var pluginname = v.name.match(/^(olsrd_.*)\.so\..*/)[1];
+
+							if (!libsArr.includes(pluginname)) {
+								var sid = uci.add('olsrd6', 'LoadPlugin');
+								uci.set('olsrd6', sid, 'ignore', '1');
+								uci.set('olsrd6', sid, 'library', pluginname);
+							}
+						}
+					});
+				});
+			}),
+		]);
 	},
 	render: function () {
 		var pathname = window.location.pathname;
@@ -39,14 +38,14 @@ return view.extend({
 		var sidIndex = segments.lastIndexOf('plugins') + 1;
 		var sid = null;
 		if (sidIndex !== -1 && sidIndex < segments.length) {
-			  sid = segments[sidIndex];
+			sid = segments[sidIndex];
 		}
 		if (sid) {
-			var 	mp = new form.Map('olsrd6', _('OLSR - Plugins'));
-   var 	p = mp.section(form.NamedSection, sid, 'LoadPlugin', _('Plugin configuration'));
+			var mp = new form.Map('olsrd6', _('OLSR - Plugins'));
+			var p = mp.section(form.NamedSection, sid, 'LoadPlugin', _('Plugin configuration'));
 			p.anonymous = true;
-			var plname=uci.get('olsrd6', sid, 'library');
-			var 	ign = p.option(form.Flag, 'ignore', _('Enable'));
+			var plname = uci.get('olsrd6', sid, 'library');
+			var ign = p.option(form.Flag, 'ignore', _('Enable'));
 			ign.enabled = '0';
 			ign.disabled = '1';
 			ign.rmempty = false;
@@ -54,7 +53,7 @@ return view.extend({
 				return uci.get('olsrd6', section_id, 'ignore') || '0';
 			};
 
-			var 	lib = p.option(form.DummyValue, 'library', _('Library'));
+			var lib = p.option(form.DummyValue, 'library', _('Library'));
 			lib.default = plname;
 
 			function Range(x, y) {
@@ -203,7 +202,6 @@ return view.extend({
 				olsrd_tas: [],
 			};
 
-
 			if (knownPlParams[plname]) {
 				for (const option of knownPlParams[plname]) {
 					const [otype, name, defaultVal, uci2cbi, cbi2uci] = option;
@@ -239,13 +237,13 @@ return view.extend({
 							}
 						}
 						if (typeof uci2cbi === 'function') {
-							field.cfgvalue = function (section) {
-								return uci2cbi(otype.cfgvalue(this, section));
+							field.cfgvalue = function (section_id) {
+								return uci2cbi(field.cfgvalue(section_id));
 							};
 						}
 						if (typeof cbi2uci === 'function') {
-							field.formvalue = function (section) {
-								return cbi2uci(otype.formvalue(this, section));
+							field.formvalue = function (section_id) {
+								return cbi2uci(field.formvalue(section_id));
 							};
 						}
 						field.optional = true;
@@ -256,44 +254,35 @@ return view.extend({
 
 			return mp.render();
 		} else {
-			var 	mpi = new form.Map('olsrd6', _('OLSR - Plugins'));
+			var mpi = new form.Map('olsrd6', _('OLSR - Plugins'));
 
+			var t = mpi.section(form.TableSection, 'LoadPlugin', _('Plugins'));
+			t.anonymous = true;
 
+			t.extedit = function (eve) {
+				var editButton = eve.target;
+				var sid;
+				var row = editButton.closest('.cbi-section-table-row');
 
-
-			
-		 
-				var t = mpi.section(form.TableSection, 'LoadPlugin', _('Plugins'));
-				t.anonymous = true;
-		
-				t.extedit = function (eve) {
-     var editButton = eve.target;
-			var sid;
-     var row = editButton.closest('.cbi-section-table-row');
-
-   if (row) {
-   sid = row.getAttribute('data-sid');
-   console.log(sid);
-   }
-   window.location.href = `plugins/${sid}`;
-
-				};
-		
-				var ign = t.option(form.Flag, 'ignore', _('Enabled'));
-				ign.enabled = '0';
-				ign.disabled = '1';
-				ign.rmempty = false;
-		
-				function ign_cfgvalue(section_id) {
-						return uci.get(section_id, 'ignore') || '0';
+				if (row) {
+					sid = row.getAttribute('data-sid');
+					console.log(sid);
 				}
-		
-				t.option(form.DummyValue, 'library', _('Library'));
-		
-				return mpi.render();
-			
+				window.location.href = `plugins/${sid}`;
+			};
 
-	
+			var ign = t.option(form.Flag, 'ignore', _('Enabled'));
+			ign.enabled = '0';
+			ign.disabled = '1';
+			ign.rmempty = false;
+
+			function ign_cfgvalue(section_id) {
+				return uci.get(section_id, 'ignore') || '0';
+			}
+
+			t.option(form.DummyValue, 'library', _('Library'));
+
+			return mpi.render();
 		}
 	},
 });

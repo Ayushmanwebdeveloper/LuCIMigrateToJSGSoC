@@ -1,65 +1,73 @@
 {
 	"olsr": {
-			"title": "OLSR",
-			"order": 5,
-			"action": {
-					"type": "firstchild"
-			}
-	},
-	"olsr/neighbours": {
-			"title": "Neighbours",
-			"order": 15,
-			"action": {
-					"type": "view",
-					"path": "olsr/status-olsr/neighbors"
-			}
+		"title": "OLSR",
+		"order": 5,
+		"action": {
+			"type": "firstchild"
+		}
 	},
 	"olsr/routes": {
-			"title": "Routes",
-			"order": 20,
-			"action": {
-					"type": "view",
-					"path": "olsr/status-olsr/routes"
-			}
+		"title": "Routes",
+		"order": 20,
+		"action": {
+			"type": "view",
+			"path": "olsr/status-olsr/routes"
+		}
 	},
 	"olsr/topology": {
 		"title": "Topology",
 		"order": 25,
 		"action": {
-				"type": "view",
-				"path": "olsr/status-olsr/topology"
+			"type": "view",
+			"path": "olsr/status-olsr/topology"
 		}
 	},
 	"olsr/hna": {
 		"title": "HNA",
 		"order": 30,
 		"action": {
-				"type": "view",
-				"path": "olsr/status-olsr/hna"
+			"type": "view",
+			"path": "olsr/status-olsr/hna"
 		}
 	},
 	"olsr/mid": {
 		"title": "MID",
 		"order": 35,
 		"action": {
-				"type": "view",
-				"path": "olsr/status-olsr/mid"
+			"type": "view",
+			"path": "olsr/status-olsr/mid"
 		}
 	},
 	"olsr/interface": {
 		"title": "Interface",
 		"order": 35,
 		"action": {
-				"type": "view",
-				"path": "olsr/status-olsr/interfaces"
+			"type": "view",
+			"path": "olsr/status-olsr/interfaces"
 		}
 	},
 	"olsr/smartgw": {
 		"title": "SmartGW",
 		"order": 40,
 		"action": {
-				"type": "view",
-				"path": "olsr/status-olsr/smartgw"
+			"type": "view",
+			"path": "olsr/status-olsr/smartgw"
+		}
+	},
+	"olsr/neighbours": {
+		"title": "Neighbours",
+		"order": 45,
+		"action": {
+			"type": "view",
+			"path": "olsr/status-olsr/neighbors"
+		}
+	},
+	"olsr/error_olsr": {
+		"title": "OLSR Error",
+		"order": 45,
+		"action": {
+			"type": "view",
+			"path": "olsr/status-olsr/error_olsr"
 		}
 	}
 }
