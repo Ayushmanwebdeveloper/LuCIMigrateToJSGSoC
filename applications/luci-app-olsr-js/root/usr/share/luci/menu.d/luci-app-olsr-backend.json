@@ -10,8 +10,15 @@
 			"path": "olsr/frontend/olsrd"
 		}
 	},
+	"admin/services/olsrd/display": {
+		"title": "Display",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "olsr/frontend/olsrddisplay"
+		}
+	},
 	"admin/services/olsrd/iface": {
-		"title": "Interfaces",
 		"order": 10,
 		"action": {
 			"type": "view",
@@ -43,6 +50,14 @@
 		"action": {
 			"type": "view",
 			"path": "olsr/frontend/olsrd6"
+		}
+	},
+	"admin/services/olsrd6/display": {
+		"title": "Display",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "olsr/frontend/olsrddisplay"
 		}
 	},
 	"admin/services/olsrd6/iface": {
