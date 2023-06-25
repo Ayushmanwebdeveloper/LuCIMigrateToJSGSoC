@@ -275,7 +275,7 @@ return view.extend({
    sid = row.getAttribute('data-sid');
    console.log(sid);
    }
-   window.location.href = `olsrd/plugins/${sid}`;
+   window.location.href = `plugins/${sid}`;
 
 				};
 		

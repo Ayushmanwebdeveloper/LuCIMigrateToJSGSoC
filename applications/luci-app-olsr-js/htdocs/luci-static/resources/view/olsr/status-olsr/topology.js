@@ -123,7 +123,7 @@ return view.extend({
 },
     load: function () {
         return Promise.all([
-            uci.load('olsrd')    
+            uci.load('olsrd'),uci.load('luci_olsr')    
         ])
     },
     render: function () {

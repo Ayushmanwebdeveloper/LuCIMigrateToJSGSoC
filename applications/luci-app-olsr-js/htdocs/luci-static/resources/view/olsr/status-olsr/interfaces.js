@@ -117,7 +117,8 @@ action_interfaces: 	async function () {
 
 
 	load: function () {
-		return Promise.all([uci.load('olsrd')]);
+
+		return Promise.all([uci.load('olsrd'),uci.load('luci_olsr') ]);
 	},
 	render: function () {
 		var iface_res;

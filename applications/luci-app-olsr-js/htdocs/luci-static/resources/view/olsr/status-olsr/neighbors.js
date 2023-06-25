@@ -229,7 +229,11 @@ return view.extend({
 },
 
 	load: function () {
-		return Promise.all([uci.load('olsrd')]);
+		var self = this;
+		poll.add(function() {
+			self.render();
+	}, 5);
+		return Promise.all([uci.load('olsrd'),uci.load('luci_olsr')   ]);
 	},
 	render: function () {
 		var neigh_res;
@@ -440,9 +444,7 @@ return view.extend({
 				}
 
 				var result = E([], {}, [h2, divToggleButtons, fieldset, statusOlsrLegend, statusOlsrCommonJs]);
-				poll.add(function () {
-					self.render();
-				}, 5);
+
 				return result;
 			})
 			.catch(function (error) {

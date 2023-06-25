@@ -110,8 +110,12 @@ return view.extend({
   });
 },
     load: function() {
+					var self = this;
+					poll.add(function() {
+						self.render();
+				}, 5);
         return Promise.all([
-            uci.load('olsrd')  
+            uci.load('olsrd'),uci.load('luci_olsr')
         ])
     },
     render: function () {
@@ -267,9 +271,7 @@ return view.extend({
 										fieldset,
 										statusOlsrCommonJs
 								]);
-								poll.add(function() {
-									self.render();
-							}, 5);
+
 								return result;
 						}
 						else {
