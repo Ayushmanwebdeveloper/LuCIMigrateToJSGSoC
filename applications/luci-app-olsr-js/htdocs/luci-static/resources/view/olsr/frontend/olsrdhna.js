@@ -5,6 +5,11 @@
 'require ui';
 
 return view.extend({
+	load: function () {
+		return Promise.all([
+						uci.load('olsrd')    
+		])
+},
 	render: function () {
 		var ipv = uci.get_first("olsrd", "olsrd", "IpVersion") || "4";
 

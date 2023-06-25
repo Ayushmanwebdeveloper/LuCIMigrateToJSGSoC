@@ -5,6 +5,11 @@
 'require ui';
 
 return view.extend({
+	load: function () {
+		return Promise.all([
+						uci.load('olsrd6')    
+		])
+},
 	render: function () {
 
 		var 	mh = new form.Map("olsrd6", _("OLSR - HNA6-Announcements"), _("Hosts in an OLSR routed network can announce connectivity " + "to external networks using HNA6 messages."));

@@ -13,6 +13,11 @@ return view.extend({
 		object: 'olsrinfo',
 		method: 'hasipip'
 	}),
+	load: function () {
+		return Promise.all([
+						uci.load('olsrd')    
+		])
+},
 	render: function () {
 		var m, s, o;
   

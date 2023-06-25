@@ -111,8 +111,7 @@ return view.extend({
 },
     load: function() {
         return Promise.all([
-            uci.load('olsrd'),
-            uci.load('system')    
+            uci.load('olsrd')  
         ])
     },
     render: function () {

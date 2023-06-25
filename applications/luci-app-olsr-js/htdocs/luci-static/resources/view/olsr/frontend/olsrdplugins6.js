@@ -2,29 +2,60 @@
 'require view';
 'require form';
 'require	uci';
-'require validation';
-'require network';
 'require ui';
+'require fs';
 
 return view.extend({
+	load: function () {
+		return Promise.all([
+			uci.load('olsrd6').then(() => {
+					return fs.list('/usr/lib').then((files) => {
+						const sections = uci.sections('olsrd6', 'LoadPlugin');
+						const libsArr = [];
+						sections.forEach((section) => {
+								const lib = section.library;
+								libsArr.push(lib);
+						});
+						
+							files.forEach((v) => {
+									if (v.name.substr(0, 6) === 'olsrd_') {
+											var pluginname = v.name.match(/^(olsrd_.*)\.so\..*/)[1];
+	
+											if (!libsArr.includes(pluginname)) {
+													var sid = uci.add('olsrd6', 'LoadPlugin');
+													uci.set('olsrd6', sid, 'ignore', '1');
+													uci.set('olsrd6', sid, 'library', pluginname);
+											}
+									}
+							});
+					});
+			})
+	]);
+	
+	},
 	render: function () {
-		if (arg[1]) {
+		var pathname = window.location.pathname;
+		var segments = pathname.split('/');
+		var sidIndex = segments.lastIndexOf('plugins') + 1;
+		var sid = null;
+		if (sidIndex !== -1 && sidIndex < segments.length) {
+			  sid = segments[sidIndex];
+		}
+		if (sid) {
 			var 	mp = new form.Map('olsrd6', _('OLSR - Plugins'));
-
-			var 	p = mp.section(form.TypedSection, 'LoadPlugin', _('Plugin configuration'));
-			p.depends('library', arg[1]);
+   var 	p = mp.section(form.NamedSection, sid, 'LoadPlugin', _('Plugin configuration'));
 			p.anonymous = true;
-
+			var plname=uci.get('olsrd6', sid, 'library');
 			var 	ign = p.option(form.Flag, 'ignore', _('Enable'));
 			ign.enabled = '0';
 			ign.disabled = '1';
 			ign.rmempty = false;
 			ign.cfgvalue = function (section_id) {
-				return uci.get('olsrd', section_id, 'ignore') || '0';
+				return uci.get('olsrd6', section_id, 'ignore') || '0';
 			};
 
 			var 	lib = p.option(form.DummyValue, 'library', _('Library'));
-			lib.default = arg[1];
+			lib.default = plname;
 
 			function Range(x, y) {
 				var t = [];
@@ -144,7 +175,7 @@ return view.extend({
 					[form.Value, 'macs_change_script', '/path/to/script'],
 				],
 				olsrd_quagga: [
-					[StaticList, 'redistribute', ['system', 'kernel', 'connect', 'static', 'rip', 'ripng', 'ospf', 'ospf6', 'isis', 'bgp', 'hsls']],
+					[form.DynamicList, 'redistribute', ['system', 'kernel', 'connect', 'static', 'rip', 'ripng', 'ospf', 'ospf6', 'isis', 'bgp', 'hsls']],
 					[form.ListValue, 'ExportRoutes', ['only', 'both']],
 					[form.Flag, 'LocalPref', 'true'],
 					[form.Value, 'Distance', Range(0, 255)],
@@ -172,8 +203,9 @@ return view.extend({
 				olsrd_tas: [],
 			};
 
-			if (knownPlParams[arg[1]]) {
-				for (const option of knownPlParams[arg[1]]) {
+
+			if (knownPlParams[plname]) {
+				for (const option of knownPlParams[plname]) {
 					const [otype, name, defaultVal, uci2cbi, cbi2uci] = option;
 					let values;
 
@@ -199,7 +231,6 @@ return view.extend({
 						}
 						bool.optional = true;
 						bool.default = defaultVal;
-						// bool.depends({ library: plugin });
 					} else {
 						const field = p.option(otype, name, name);
 						if (values) {
@@ -219,54 +250,50 @@ return view.extend({
 						}
 						field.optional = true;
 						field.default = defaultVal;
-						//field.depends({ library: plugin });
 					}
 				}
 			}
 
-			return mp;
+			return mp.render();
 		} else {
 			var 	mpi = new form.Map('olsrd6', _('OLSR - Plugins'));
 
-			const plugins = {};
-			uci.sections('olsrd6', 'LoadPlugin', (section) => {
-				if (section.library && !plugins[section.library]) {
-					plugins[section.library] = true;
+
+
+
+			
+		 
+				var t = mpi.section(form.TableSection, 'LoadPlugin', _('Plugins'));
+				t.anonymous = true;
+		
+				t.extedit = function (eve) {
+     var editButton = eve.target;
+			var sid;
+     var row = editButton.closest('.cbi-section-table-row');
+
+   if (row) {
+   sid = row.getAttribute('data-sid');
+   console.log(sid);
+   }
+   window.location.href = `olsrd6/plugins/${sid}`;
+
+				};
+		
+				var ign = t.option(form.Flag, 'ignore', _('Enabled'));
+				ign.enabled = '0';
+				ign.disabled = '1';
+				ign.rmempty = false;
+		
+				function ign_cfgvalue(section_id) {
+						return uci.get(section_id, 'ignore') || '0';
 				}
-			});
+		
+				t.option(form.DummyValue, 'library', _('Library'));
+		
+				return mpi.render();
+			
 
-			// Create a loadplugin section for each found plugin
-			fs.list('/usr/lib').forEach((v) => {
-				if (v.substr(0, 6) === 'olsrd_') {
-					v = v.match(/^(olsrd_.*)\.so\..*/)[1];
-					if (!plugins[v]) {
-						var sid = uci.add('olsrd6', 'LoadPlugin');
-						uci.set('olsrd6', sid, 'ignore', '1');
-						uci.set('olsrd6', sid, 'library', v);
-					}
-				}
-			});
-
-			var 	t = mpi.section(TypedSection, 'LoadPlugin', _('Plugins'));
-			t.anonymous = true;
-			t.template = 'cbi/tblsection';
-			t.override_scheme = true;
-
-			t.extedit = function (section_id) {
-				var lib = uci.get(section_id, 'library') || '';
-				return '/cgi-bin/luci/admin/services/olsrd6/plugins/' + lib;
-			};
-			var 	ign = t.option(Flag, 'ignore', _('Enabled'));
-			ign.enabled = '0';
-			ign.disabled = '1';
-			ign.rmempty = false;
-			function ign_cfgvalue(section_id) {
-				return uci.get(section_id, 'ignore') || '0';
-			}
-
-			t.option(DummyValue, 'library', _('Library'));
-
-			return mpi.render();
+	
 		}
 	},
 });

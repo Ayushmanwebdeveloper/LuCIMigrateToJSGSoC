@@ -266,7 +266,7 @@ return view.extend({
 				var t = mpi.section(form.TableSection, 'LoadPlugin', _('Plugins'));
 				t.anonymous = true;
 		
-				t.extedit = function (section_id) {
+				t.extedit = function (eve) {
      var editButton = eve.target;
 			var sid;
      var row = editButton.closest('.cbi-section-table-row');

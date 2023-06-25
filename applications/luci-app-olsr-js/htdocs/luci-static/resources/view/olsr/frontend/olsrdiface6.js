@@ -5,6 +5,11 @@
 'require ui';
 
 return view.extend({
+	load: function () {
+		return Promise.all([
+						uci.load('olsrd6')    
+		])
+},
 	render: function () {
 		function write_float(section_id, value) {
 			let n = parseFloat(value);

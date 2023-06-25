@@ -229,7 +229,7 @@ return view.extend({
 },
 
 	load: function () {
-		return Promise.all([uci.load('olsrd'), uci.load('system')]);
+		return Promise.all([uci.load('olsrd')]);
 	},
 	render: function () {
 		var neigh_res;

@@ -4,7 +4,7 @@
 'require ui';
 
 return view.extend({
-	render: function () {
+ render: function () {
 		var m, s, o;
 
 		m = new form.Map("luci_olsr", _("OLSR - Display Options"));
