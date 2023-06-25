@@ -2,51 +2,50 @@
 'require view';
 'require form';
 'require	uci';
-'require validation';
-'require network';
 'require ui';
 'require fs';
 
 return view.extend({
 	load: function () {
-		const plugins = {};
-		uci.sections('olsrd', 'LoadPlugin', (section) => {
-			if (section.library && !plugins[section.library]) {
-				plugins[section.library] = true;
-			}
-		});
-		return	Promise.all([
-			fs.list('/usr/lib').then((files) => {
-				
-				files.forEach((v) => {
-						if (v.name.substr(0, 6) === 'olsrd_') {
-								var pluginname = v.name.match(/^(olsrd.*)\.so\..*/)[1];
-								if (!plugins[pluginname]) {
-										if (!uci.get('olsrd', pluginname)) {
-														var sid = uci.add('olsrd', 'LoadPlugin', pluginname);
-														uci.set('olsrd', sid, 'ignore', '1');
-														uci.set('olsrd', sid, 'library', pluginname);
-												
-										}
-								}
-						}
-				});
-		})
-		])
+		return Promise.all([
+			uci.load('olsrd').then(() => {
+					return fs.list('/usr/lib').then((files) => {
+						const sections = uci.sections('olsrd', 'LoadPlugin');
+						const libsArr = [];
+						sections.forEach((section) => {
+								const lib = section.library;
+								libsArr.push(lib);
+						});
+						
+							files.forEach((v) => {
+									if (v.name.substr(0, 6) === 'olsrd_') {
+											var pluginname = v.name.match(/^(olsrd.*)\.so\..*/)[1];
+	
+											if (!libsArr.includes(pluginname)) {
+													var sid = uci.add('olsrd', 'LoadPlugin');
+													uci.set('olsrd', sid, 'ignore', '1');
+													uci.set('olsrd', sid, 'library', pluginname);
+											}
+									}
+							});
+					});
+			})
+	]);
+	
 	},
 	render: function () {
 		var pathname = window.location.pathname;
 		var segments = pathname.split('/');
 		var sidIndex = segments.lastIndexOf('plugins') + 1;
-		var pname = null;
+		var sid = null;
 		if (sidIndex !== -1 && sidIndex < segments.length) {
-			  pname = segments[sidIndex];
+			  sid = segments[sidIndex];
 		}
-		if (pname) {
+		if (sid) {
 			var 	mp = new form.Map('olsrd', _('OLSR - Plugins'));
-   var 	p = mp.section(form.TypedSection, 'LoadPlugin', _('Plugin configuration'));
+   var 	p = mp.section(form.NamedSection, sid, 'LoadPlugin', _('Plugin configuration'));
 			p.anonymous = true;
-
+			var plname=uci.get('olsrd', sid, 'library');
 			var 	ign = p.option(form.Flag, 'ignore', _('Enable'));
 			ign.enabled = '0';
 			ign.disabled = '1';
@@ -56,7 +55,7 @@ return view.extend({
 			};
 
 			var 	lib = p.option(form.DummyValue, 'library', _('Library'));
-			lib.default = pname;
+			lib.default = plname;
 
 			function Range(x, y) {
 				var t = [];
@@ -176,7 +175,7 @@ return view.extend({
 					[form.Value, 'macs_change_script', '/path/to/script'],
 				],
 				olsrd_quagga: [
-					[StaticList, 'redistribute', ['system', 'kernel', 'connect', 'static', 'rip', 'ripng', 'ospf', 'ospf6', 'isis', 'bgp', 'hsls']],
+					[form.DynamicList, 'redistribute', ['system', 'kernel', 'connect', 'static', 'rip', 'ripng', 'ospf', 'ospf6', 'isis', 'bgp', 'hsls']],
 					[form.ListValue, 'ExportRoutes', ['only', 'both']],
 					[form.Flag, 'LocalPref', 'true'],
 					[form.Value, 'Distance', Range(0, 255)],
@@ -204,8 +203,9 @@ return view.extend({
 				olsrd_tas: [],
 			};
 
-			if (knownPlParams[pname]) {
-				for (const option of knownPlParams[pname]) {
+
+			if (knownPlParams[plname]) {
+				for (const option of knownPlParams[plname]) {
 					const [otype, name, defaultVal, uci2cbi, cbi2uci] = option;
 					let values;
 
@@ -254,7 +254,7 @@ return view.extend({
 				}
 			}
 
-			return mp;
+			return mp.render();
 		} else {
 			var 	mpi = new form.Map('olsrd', _('OLSR - Plugins'));
 
@@ -266,10 +266,18 @@ return view.extend({
 				var t = mpi.section(form.TableSection, 'LoadPlugin', _('Plugins'));
 				t.anonymous = true;
 		
-				// t.extedit = function (section_id) {
-				// 		var lib = uci.get(section_id, 'library') || '';
-				// 		return '/cgi-bin/luci/admin/services/olsrd/plugins/' + lib;
-				// };
+				t.extedit = function (section_id) {
+     var editButton = eve.target;
+			var sid;
+     var row = editButton.closest('.cbi-section-table-row');
+
+   if (row) {
+   sid = row.getAttribute('data-sid');
+   console.log(sid);
+   }
+   window.location.href = `olsrd/plugins/${sid}`;
+
+				};
 		
 				var ign = t.option(form.Flag, 'ignore', _('Enabled'));
 				ign.enabled = '0';
