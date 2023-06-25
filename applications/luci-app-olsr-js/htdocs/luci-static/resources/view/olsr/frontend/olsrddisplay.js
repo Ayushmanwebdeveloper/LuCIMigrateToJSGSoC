@@ -2,6 +2,7 @@
 'require view';
 'require form';
 'require ui';
+'require uci';
 
 return view.extend({
 	load: function () {
